@@ -1,18 +1,18 @@
 package com.gu.flexible.snapshotter.logic
 
-import com.gu.flexible.snapshotter.model.{Attempt, ContentIds}
+import com.gu.flexible.snapshotter.model.{Attempt, Snapshot, SnapshotRequest, SnapshotRequestBatch}
 import com.gu.flexible.snapshotter.{Config, Logging}
 import org.joda.time.DateTime
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 object ApiLogic extends Logging {
-  def contentWithId(id: String)(implicit ws:WSClient, config:Config, context:ExecutionContext): Attempt[(String, JsValue)] = {
-    val request = ws.url(s"${config.contentRawUri}/$id")
-    val json = request.get().map(id -> _.json)
-    json onFailure { case t => log.warn(s"Error occurred fetching content with ID $id from API", t)}
+  def contentForSnapshot(snapshotRequest: SnapshotRequest)(implicit ws:WSClient, config:Config, context:ExecutionContext): Attempt[Snapshot] = {
+    val request = ws.url(s"${config.contentRawUri}/${snapshotRequest.contentId}")
+    val json = request.get().map(response => Snapshot(snapshotRequest.contentId, snapshotRequest.reason, response.json))
+    json onFailure { case t => log.warn(s"Error occurred fetching content with ID ${snapshotRequest.contentId} from API", t)}
     Attempt.Async.Right(json)
   }
 
@@ -23,7 +23,7 @@ object ApiLogic extends Logging {
     Attempt.Async.Right(json)
   }
 
-  def parseContentIds(json:JsValue): ContentIds = ContentIds((json \ "data").as[Seq[JsObject]].map(getId))
+  def parseContentIds(json:JsValue): Seq[String] = (json \ "data").as[Seq[JsObject]].map(getId)
 
   def fiveMinutesAgo: DateTime = new DateTime().minusMinutes(5)
 
