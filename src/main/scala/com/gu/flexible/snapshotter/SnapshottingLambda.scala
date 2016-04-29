@@ -22,9 +22,9 @@ class SnapshottingLambda {
     val buffers = buffersFromLambdaEvent(input)
     val snapshotRequestAttempts = buffers.map(deserialiseFromByteBuffer[BatchSnapshotRequest])
     for {
-      snapshotRequests <- Attempt.successfulAttempts(snapshotRequestAttempts)
-      ids = snapshotRequests.flatMap(_.asSnapshotRequests)
-      apiResults = ids.map(contentForSnapshot(_))
+      batchSnapshotRequests <- Attempt.successfulAttempts(snapshotRequestAttempts)
+      snapshotRequests = batchSnapshotRequests.flatMap(_.asSnapshotRequests)
+      apiResults = snapshotRequests.map(contentForSnapshot)
       successfulApiResults <- Attempt.successfulAttempts(apiResults)
     } {
       successfulApiResults.foreach{ case Snapshot(id, reason, json) =>
