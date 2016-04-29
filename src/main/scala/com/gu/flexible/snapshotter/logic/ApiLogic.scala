@@ -1,6 +1,6 @@
 package com.gu.flexible.snapshotter.logic
 
-import com.gu.flexible.snapshotter.model.{Attempt, Snapshot, SnapshotRequest, SnapshotRequestBatch}
+import com.gu.flexible.snapshotter.model.{Attempt, Snapshot, SnapshotRequest, BatchSnapshotRequest}
 import com.gu.flexible.snapshotter.{Config, Logging}
 import org.joda.time.DateTime
 import play.api.libs.json.{JsObject, JsValue}
