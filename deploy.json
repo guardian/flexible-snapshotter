@@ -1,0 +1,21 @@
+{
+  "defaultStacks" : ["flexible"],
+  "packages" : {
+    "snapshotter-lambda":{
+      "type":"aws-s3",
+      "data":{
+        "bucket" : "composer-dist",
+        "publicReadAcl" : false
+      }
+    }
+  },
+  "recipes":{
+    "default":{
+      "depends":["lambda-upload"]
+    },
+    "lambda-upload":{
+      "actions":["snapshotter-lambda.uploadStaticFiles"]
+    }
+  }
+
+}

@@ -1,4 +1,6 @@
-name := "flexible-snapshotter"
+import com.typesafe.sbt.packager.archetypes.JavaAppPackaging._
+
+name := "snapshotter-lambda"
 organization  := "com.gu"
 
 scalaVersion in ThisBuild := "2.11.8"
@@ -19,3 +21,24 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-ws" % playVersion,
   "org.scalatest" %% "scalatest" % "2.2.5" % "test"
 )
+
+enablePlugins(JavaAppPackaging, RiffRaffArtifact)
+
+// remove the application itself and include the class files in the root of zip instead
+mappings in Universal := (mappings in Universal).value.filterNot{ case (file, targetFileName) =>
+  targetFileName.contains(name.value)
+}
+
+mappings in Universal ++= {
+  val cd = (classDirectory in Compile).value
+  PathFinder(cd).***.filter(cd.!=).pair(_.relativeTo(cd).map(_.toString))
+}
+
+topLevelDirectory in Universal := None
+packageName in Universal := normalizedName.value
+
+riffRaffPackageType := (packageBin in Universal).value
+riffRaffUploadArtifactBucket := Option("riffraff-artifact")
+riffRaffUploadManifestBucket := Option("riffraff-builds")
+riffRaffPackageName := s"editorial-tools:flexible:$normalizedName"
+riffRaffManifestProjectName := riffRaffPackageName.value
