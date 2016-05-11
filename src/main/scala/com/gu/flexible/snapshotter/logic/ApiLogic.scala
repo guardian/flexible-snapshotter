@@ -9,7 +9,7 @@ import play.api.libs.ws.WSClient
 import scala.concurrent.ExecutionContext
 
 object ApiLogic extends Logging {
-  def contentForSnapshot(snapshotRequest: SnapshotRequest): Attempt[Snapshot] = {
+  def contentForSnapshot(snapshotRequest: SnapshotRequest)(implicit ws:WSClient, config:Config, context:ExecutionContext): Attempt[Snapshot] = {
     contentForId(snapshotRequest.contentId).map{ json =>
       Snapshot(snapshotRequest.contentId, snapshotRequest.reason, json)
     }

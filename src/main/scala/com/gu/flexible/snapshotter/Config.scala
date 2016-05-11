@@ -13,7 +13,7 @@ object Config {
 sealed trait Config {
   def apiUrl: String
   def bucket: String
-  def kmsKey: Option[String]
+  def kmsKey: Option[String] = None
   def kinesisStream: String
 
   def region: Region = Regions.getCurrentRegion
@@ -25,7 +25,6 @@ sealed trait Config {
 class DevConfig extends Config {
   override val apiUrl: String = "http://internal-Flexible-ApiLoadB-15RTA1C81ZYGU-432053948.eu-west-1.elb.amazonaws.com:8080"
   override val bucket: String = "flexible-snapshots-dev"
-  override val kmsKey: Option[String] = ???
   override val kinesisStream: String = ???
 
   override val region = Region.getRegion(Regions.EU_WEST_1)
@@ -34,7 +33,6 @@ class DevConfig extends Config {
 class CodeConfig extends Config {
   override val bucket: String = "flexible-snapshots-code"
   override val apiUrl: String = "http://internal-Flexible-ApiLoadB-15RTA1C81ZYGU-432053948.eu-west-1.elb.amazonaws.com:8080"
-  override val kmsKey: Option[String] = ???
   override val kinesisStream: String = ???
 }
 
