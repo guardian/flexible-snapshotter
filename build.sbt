@@ -40,6 +40,5 @@ packageName in Universal := normalizedName.value
 riffRaffPackageType := (packageBin in Universal).value
 riffRaffUploadArtifactBucket := Option("riffraff-artifact")
 riffRaffUploadManifestBucket := Option("riffraff-builds")
-riffRaffPackageName := s"editorial-tools:flexible:${normalizedName.value}"
-riffRaffManifestProjectName := riffRaffPackageName.value
+riffRaffManifestProjectName :=  s"editorial-tools:flexible:${name.value}"
 riffRaffBuildIdentifier :=  Option(System.getenv("CIRCLE_BUILD_NUM")).getOrElse("dev")
