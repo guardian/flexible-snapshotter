@@ -2,7 +2,7 @@
   "defaultStacks" : ["flexible"],
   "packages" : {
     "snapshotter-lambda":{
-      "type":"aws-s3",
+      "type":"autoscaling",
       "data":{
         "bucket" : "composer-dist",
         "publicReadAcl" : false
@@ -14,8 +14,7 @@
       "depends":["lambda-upload"]
     },
     "lambda-upload":{
-      "actions":["snapshotter-lambda.uploadStaticFiles"]
+      "actions":["snapshotter-lambda.uploadArtifacts"]
     }
   }
-
 }
