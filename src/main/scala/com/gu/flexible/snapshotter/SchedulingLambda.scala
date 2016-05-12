@@ -13,12 +13,14 @@ class SchedulingLambda extends Logging {
   import ApiLogic._
   import KinesisLogic._
 
-  implicit val config = Config()
   implicit val wsClient: WSClient = WSClientFactory.createClient
   implicit val kinesisClient = AWSClientFactory.createKinesisClient
+  implicit val lambdaClient = AWSClientFactory.createLambdaClient
 
   // this is run under a lambda cron
   def run(event: JMap[String, Object], context: Context): Unit = {
+    implicit val config = SchedulerConfig.resolve(Config.guessStage(context), context)
+
     for {
       apiResult <- contentModifiedSince(fiveMinutesAgo)
       contentIds = parseContentIds(apiResult)

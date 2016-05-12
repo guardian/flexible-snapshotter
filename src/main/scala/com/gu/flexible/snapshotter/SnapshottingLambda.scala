@@ -14,11 +14,13 @@ class SnapshottingLambda {
   import ApiLogic._
   import S3Logic._
 
-  implicit val config = Config()
   implicit val wsClient = WSClientFactory.createClient
   implicit val s3Client = AWSClientFactory.createS3Client
+  implicit val lambdaClient = AWSClientFactory.createLambdaClient
 
   def snapshot(input: KinesisEvent, context: Context) = {
+    implicit val config = SnapshotterConfig.resolve(Config.guessStage(context), context)
+
     val buffers = buffersFromLambdaEvent(input)
     val snapshotRequestAttempts = buffers.map(deserialiseFromByteBuffer[BatchSnapshotRequest])
     for {

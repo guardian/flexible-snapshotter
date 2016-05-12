@@ -6,13 +6,13 @@ import java.nio.charset.StandardCharsets
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.{AmazonClientException, AmazonServiceException}
 import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest, SSEAwsKeyManagementParams}
-import com.gu.flexible.snapshotter.{Config, Logging}
+import com.gu.flexible.snapshotter.{Logging, SnapshotterConfig}
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json.{JsValue, Json}
 
 object S3Logic extends Logging {
-  def uploadToS3Bucket(id: String, date: DateTime, content: JsValue)(implicit s3Client: AmazonS3Client, config: Config): Unit = {
+  def uploadToS3Bucket(id: String, date: DateTime, content: JsValue)(implicit s3Client: AmazonS3Client, config: SnapshotterConfig): Unit = {
     val jsonBytes = Json.prettyPrint(content).getBytes(StandardCharsets.UTF_8)
 
     val key = makeKey(id, date)

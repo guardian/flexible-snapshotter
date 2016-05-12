@@ -1,44 +1,74 @@
 package com.gu.flexible.snapshotter
 
 import com.amazonaws.regions.{Region, Regions}
+import com.amazonaws.services.lambda.AWSLambdaClient
+import com.amazonaws.services.lambda.model.GetFunctionConfigurationRequest
 import com.amazonaws.services.lambda.runtime.Context
+import play.api.libs.json.Json
 
 object Config {
-  def apply() = new ProdConfig()
+  def apiUrl(stage: String): String = stage match {
+    case "PROD" => "http://internal-Flexible-ApiLoadB-1QAHGRQLH03UW-649659201.eu-west-1.elb.amazonaws.com:8080"
+    case _ => "http://internal-Flexible-ApiLoadB-15RTA1C81ZYGU-432053948.eu-west-1.elb.amazonaws.com:8080"
+  }
 
-  def guessStage(context: Context): Option[String] =
-    context.getFunctionName.split(Array('-','_')).toList.filter(_.length > 0).lastOption
+  def guessStage(context: Context): String =
+    context.getFunctionName.split(Array('-','_')).toList.filter(_.length > 0).lastOption.getOrElse {
+      throw new IllegalArgumentException(s"Couldn't guess stage from function name ${context.getFunctionName}")
+    }
 }
 
-sealed trait Config {
-  def apiUrl: String
-  def bucket: String
-  def kmsKey: Option[String] = None
-  def kinesisStream: String
+object LambdaConfig {
+  def getDescriptionJson(context: Context)(implicit lambdaClient:AWSLambdaClient) = {
+    val functionMetadata = lambdaClient.getFunctionConfiguration(
+      new GetFunctionConfigurationRequest()
+        .withFunctionName(context.getFunctionName)
+    )
+    Json.parse(functionMetadata.getDescription)
+  }
+}
 
-  def region: Region = Regions.getCurrentRegion
+object LambdaSchedulerConfig {
+  implicit val configReads = Json.reads[LambdaSchedulerConfig]
+}
+case class LambdaSchedulerConfig(kinesisStream: String)
+
+object LambdaSnapshotterConfig {
+  implicit val configReads = Json.reads[LambdaSnapshotterConfig]
+}
+case class LambdaSnapshotterConfig(bucket: String, kmsKey: Option[String])
+
+sealed trait CommonConfig {
+  def apiUrl: String
+  def region: Region
 
   def contentUri = s"$apiUrl/content"
   def contentRawUri = s"$apiUrl/contentRaw"
 }
 
-class DevConfig extends Config {
-  override val apiUrl: String = "http://internal-Flexible-ApiLoadB-15RTA1C81ZYGU-432053948.eu-west-1.elb.amazonaws.com:8080"
-  override val bucket: String = "flexible-snapshots-dev"
-  override val kinesisStream: String = ???
+case class SnapshotterConfig(
+  bucket: String,
+  apiUrl: String,
+  kmsKey: Option[String] = None,
+  region: Region = Regions.getCurrentRegion) extends CommonConfig
 
-  override val region = Region.getRegion(Regions.EU_WEST_1)
+object SnapshotterConfig {
+  def resolve(stage: String, context: Context)(implicit lambdaClient: AWSLambdaClient): SnapshotterConfig = {
+    val lambdaJson = LambdaConfig.getDescriptionJson(context)
+    val lambdaConfig = lambdaJson.as[LambdaSnapshotterConfig]
+    SnapshotterConfig(lambdaConfig.bucket, Config.apiUrl(stage), lambdaConfig.kmsKey)
+  }
 }
 
-class CodeConfig extends Config {
-  override val bucket: String = "flexible-snapshots-code"
-  override val apiUrl: String = "http://internal-Flexible-ApiLoadB-15RTA1C81ZYGU-432053948.eu-west-1.elb.amazonaws.com:8080"
-  override val kinesisStream: String = ???
-}
+case class SchedulerConfig(
+  kinesisStream: String,
+  apiUrl: String,
+  region: Region = Regions.getCurrentRegion) extends CommonConfig
 
-class ProdConfig extends Config {
-  override val apiUrl: String = "http://internal-Flexible-ApiLoadB-1QAHGRQLH03UW-649659201.eu-west-1.elb.amazonaws.com:8080"
-  override val bucket: String = "flexible-snapshots-prod"
-  override val kmsKey: Option[String] = ???
-  override val kinesisStream: String = ???
+object SchedulerConfig {
+  def resolve(stage: String, context: Context)(implicit lambdaClient: AWSLambdaClient): SchedulerConfig = {
+    val lambdaJson = LambdaConfig.getDescriptionJson(context)
+    val lambdaConfig = lambdaJson.as[LambdaSchedulerConfig]
+    SchedulerConfig(lambdaConfig.kinesisStream, Config.apiUrl(stage))
+  }
 }

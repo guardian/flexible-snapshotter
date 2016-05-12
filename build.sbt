@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-log4j" % "1.0.0",
   "org.slf4j" % "slf4j-log4j12" % "1.7.21",
   "com.amazonaws" % "aws-java-sdk-s3" % awsVersion,
+  "com.amazonaws" % "aws-java-sdk-lambda" % awsVersion,
   "com.typesafe.play" %% "play-json" % playVersion,
   "com.typesafe.play" %% "play-ws" % playVersion,
   "org.scalatest" %% "scalatest" % "2.2.5" % "test"

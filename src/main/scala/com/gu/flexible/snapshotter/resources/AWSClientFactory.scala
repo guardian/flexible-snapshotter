@@ -1,10 +1,12 @@
 package com.gu.flexible.snapshotter.resources
 
+import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.kinesis.AmazonKinesisClient
+import com.amazonaws.services.lambda.AWSLambdaClient
 import com.amazonaws.services.s3.AmazonS3Client
-import com.gu.flexible.snapshotter.Config
 
 object AWSClientFactory {
-  def createKinesisClient(implicit config:Config): AmazonKinesisClient = new AmazonKinesisClient().withRegion(config.region)
-  def createS3Client(implicit config: Config): AmazonS3Client = new AmazonS3Client().withRegion(config.region)
+  def createKinesisClient(implicit region:Region = Regions.getCurrentRegion): AmazonKinesisClient = new AmazonKinesisClient().withRegion(region)
+  def createS3Client(implicit region:Region = Regions.getCurrentRegion): AmazonS3Client = new AmazonS3Client().withRegion(region)
+  def createLambdaClient(implicit region:Region = Regions.getCurrentRegion): AWSLambdaClient = new AWSLambdaClient().withRegion(region)
 }
