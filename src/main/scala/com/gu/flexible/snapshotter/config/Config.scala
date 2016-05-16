@@ -28,47 +28,10 @@ object LambdaConfig {
   }
 }
 
-object LambdaSchedulerConfig {
-  implicit val configReads = Json.reads[LambdaSchedulerConfig]
-}
-case class LambdaSchedulerConfig(kinesisStream: String)
-
-object LambdaSnapshotterConfig {
-  implicit val configReads = Json.reads[LambdaSnapshotterConfig]
-}
-case class LambdaSnapshotterConfig(bucket: String, kmsKey: Option[String])
-
-sealed trait CommonConfig {
+trait CommonConfig {
   def apiUrl: String
   def region: Region
 
   def contentUri = s"$apiUrl/content"
   def contentRawUri = s"$apiUrl/contentRaw"
-}
-
-case class SnapshotterConfig(
-  bucket: String,
-  apiUrl: String,
-  kmsKey: Option[String] = None,
-  region: Region = Regions.getCurrentRegion) extends CommonConfig
-
-object SnapshotterConfig {
-  def resolve(stage: String, context: Context)(implicit lambdaClient: AWSLambdaClient): SnapshotterConfig = {
-    val lambdaJson = LambdaConfig.getDescriptionJson(context)
-    val lambdaConfig = lambdaJson.as[LambdaSnapshotterConfig]
-    SnapshotterConfig(lambdaConfig.bucket, Config.apiUrl(stage), lambdaConfig.kmsKey)
-  }
-}
-
-case class SchedulerConfig(
-  kinesisStream: String,
-  apiUrl: String,
-  region: Region = Regions.getCurrentRegion) extends CommonConfig
-
-object SchedulerConfig {
-  def resolve(stage: String, context: Context)(implicit lambdaClient: AWSLambdaClient): SchedulerConfig = {
-    val lambdaJson = LambdaConfig.getDescriptionJson(context)
-    val lambdaConfig = lambdaJson.as[LambdaSchedulerConfig]
-    SchedulerConfig(lambdaConfig.kinesisStream, Config.apiUrl(stage))
-  }
 }
