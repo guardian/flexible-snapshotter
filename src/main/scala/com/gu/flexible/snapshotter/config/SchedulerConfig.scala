@@ -3,7 +3,12 @@ package com.gu.flexible.snapshotter.config
 import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.lambda.AWSLambdaClient
 import com.amazonaws.services.lambda.runtime.Context
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
+
+object LambdaSchedulerConfig {
+  implicit val configReads = Json.reads[LambdaSchedulerConfig]
+}
+case class LambdaSchedulerConfig(kinesisStream: String)
 
 case class SchedulerConfig(
   kinesisStream: String,
@@ -17,8 +22,3 @@ object SchedulerConfig {
     SchedulerConfig(lambdaConfig.kinesisStream, Config.apiUrl(stage))
   }
 }
-
-object LambdaSchedulerConfig {
-  implicit val configReads = Json.reads[LambdaSchedulerConfig]
-}
-case class LambdaSchedulerConfig(kinesisStream: String)
