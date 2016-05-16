@@ -2,6 +2,8 @@ package com.gu.flexible.snapshotter
 
 import java.util.{Map => JMap}
 
+import com.amazonaws.regions.Regions
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.flexible.snapshotter.config.{Config, SchedulerConfig}
@@ -14,6 +16,7 @@ class SchedulingLambda extends Logging {
   import ApiLogic._
   import KinesisLogic._
 
+  implicit val region: Regions = Option(System.getenv("AWS_DEFAULT_REGION")).map(Regions.fromName).get
   implicit val wsClient: WSClient = WSClientFactory.createClient
   implicit val kinesisClient = AWSClientFactory.createKinesisClient
   implicit val lambdaClient = AWSClientFactory.createLambdaClient

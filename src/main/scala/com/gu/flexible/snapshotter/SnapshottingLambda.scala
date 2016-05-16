@@ -1,5 +1,6 @@
 package com.gu.flexible.snapshotter
 
+import com.amazonaws.regions.Regions
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.flexible.snapshotter.config.{Config, SnapshotterConfig}
@@ -15,6 +16,7 @@ class SnapshottingLambda {
   import ApiLogic._
   import S3Logic._
 
+  implicit val region: Regions = Option(System.getenv("AWS_DEFAULT_REGION")).map(Regions.fromName).get
   implicit val wsClient = WSClientFactory.createClient
   implicit val s3Client = AWSClientFactory.createS3Client
   implicit val lambdaClient = AWSClientFactory.createLambdaClient
