@@ -34,6 +34,7 @@ object KinesisLogic extends Logging {
   }
 
   def sendToKinesis(streamName: String, buffer: ByteBuffer)(implicit client:AmazonKinesisClient): Unit = {
+    log.info(s"Sending to Kinesis: ${new String(buffer.array(), StandardCharsets.UTF_8)}")
     client.putRecord(
       new PutRecordRequest().
         withStreamName(streamName).

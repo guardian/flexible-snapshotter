@@ -27,6 +27,7 @@ object ApiLogic extends Logging {
     val request = ws.url(config.contentUri).withQueryString("since" -> since.toString)
     val json = request.get().map(_.json)
     json onFailure { case t => log.warn("Error occurred fetching from API", t) }
+    log.info(s"Content modified since $since: $json")
     Attempt.Async.Right(json)
   }
 
