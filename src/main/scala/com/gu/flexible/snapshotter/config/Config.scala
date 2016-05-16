@@ -1,4 +1,4 @@
-package com.gu.flexible.snapshotter
+package com.gu.flexible.snapshotter.config
 
 import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.lambda.AWSLambdaClient

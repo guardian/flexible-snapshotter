@@ -4,6 +4,7 @@ import java.util.{Map => JMap}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import com.amazonaws.services.lambda.runtime.Context
+import com.gu.flexible.snapshotter.config.{Config, SchedulerConfig}
 import com.gu.flexible.snapshotter.logic.{ApiLogic, KinesisLogic}
 import com.gu.flexible.snapshotter.model.BatchSnapshotRequest
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}

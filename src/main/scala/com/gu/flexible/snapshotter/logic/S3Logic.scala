@@ -6,7 +6,8 @@ import java.nio.charset.StandardCharsets
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.{AmazonClientException, AmazonServiceException}
 import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest, SSEAwsKeyManagementParams}
-import com.gu.flexible.snapshotter.{Logging, SnapshotterConfig}
+import com.gu.flexible.snapshotter.Logging
+import com.gu.flexible.snapshotter.config.SnapshotterConfig
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json.{JsValue, Json}

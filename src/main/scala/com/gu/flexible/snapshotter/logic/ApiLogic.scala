@@ -1,7 +1,8 @@
 package com.gu.flexible.snapshotter.logic
 
 import com.gu.flexible.snapshotter.model.{Attempt, Snapshot, SnapshotRequest}
-import com.gu.flexible.snapshotter.{CommonConfig, Logging}
+import com.gu.flexible.snapshotter.Logging
+import com.gu.flexible.snapshotter.config.CommonConfig
 import org.joda.time.DateTime
 import play.api.libs.json.{JsObject, JsValue}
 import play.api.libs.ws.WSClient

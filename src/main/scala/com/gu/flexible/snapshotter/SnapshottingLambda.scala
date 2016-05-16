@@ -2,8 +2,9 @@ package com.gu.flexible.snapshotter
 
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.lambda.runtime.Context
+import com.gu.flexible.snapshotter.config.{Config, SnapshotterConfig}
 import com.gu.flexible.snapshotter.logic.{ApiLogic, KinesisLogic, S3Logic}
-import com.gu.flexible.snapshotter.model.{Attempt, Snapshot, BatchSnapshotRequest}
+import com.gu.flexible.snapshotter.model.{Attempt, BatchSnapshotRequest, Snapshot}
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}
 import org.joda.time.DateTime
 
