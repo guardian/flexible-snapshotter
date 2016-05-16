@@ -16,7 +16,7 @@ class SchedulingLambda extends Logging {
   import ApiLogic._
   import KinesisLogic._
 
-  implicit val region: Regions = Option(System.getenv("AWS_DEFAULT_REGION")).map(Regions.fromName).get
+  implicit val region: Regions = AWSClientFactory.getRegion
   implicit val wsClient: WSClient = WSClientFactory.createClient
   implicit val kinesisClient = AWSClientFactory.createKinesisClient
   implicit val lambdaClient = AWSClientFactory.createLambdaClient
