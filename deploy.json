@@ -2,19 +2,33 @@
   "defaultStacks" : ["flexible"],
   "packages" : {
     "snapshotter-lambda":{
-      "type":"autoscaling",
+      "type":"aws-lambda",
       "data":{
-        "bucket" : "composer-dist",
-        "publicReadAcl" : false
+        "bucket": "composer-dist",
+        "functionName": "flexible-snapshotter-snapshotting-"
+      }
+    },
+    "scheduler-lambda":{
+      "type":"aws-lambda",
+      "data":{
+        "bucket": "composer-dist",
+        "functionName": "flexible-snapshotter-scheduling-",
+        "fileName": "snapshotter-lambda.zip"
       }
     }
   },
   "recipes":{
     "default":{
-      "depends":["lambda-upload"]
+      "depends":["lambda-upload", "snapshotter-update", "scheduler-update"]
     },
     "lambda-upload":{
-      "actions":["snapshotter-lambda.uploadArtifacts"]
+      "actions":["snapshotter-lambda.uploadLambda"]
+    },
+    "snapshotter-update":{
+      "actions":["snapshotter-lambda.updateLambda"]
+    },
+    "scheduler-update":{
+      "actions":["scheduler-lambda.updateLambda"]
     }
   }
 }
