@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
 import com.amazonaws.services.kinesis.AmazonKinesisClient
-import com.amazonaws.services.kinesis.model.PutRecordRequest
+import com.amazonaws.services.kinesis.model.{PutRecordRequest, PutRecordResult}
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.gu.flexible.snapshotter.Logging
 import com.gu.flexible.snapshotter.model.{Attempt, AttemptError, AttemptErrors}
@@ -33,15 +33,20 @@ object KinesisLogic extends Logging {
     )
   }
 
-  def sendToKinesis(streamName: String, buffer: ByteBuffer)(implicit client:AmazonKinesisClient): Unit = {
+  def sendToKinesis(streamName: String, buffer: ByteBuffer)(implicit client:AmazonKinesisClient): PutRecordResult = {
     log.info(s"Sending to Kinesis: ${new String(buffer.array(), StandardCharsets.UTF_8)}")
-    client.putRecord(
+    val result = client.putRecord(
       new PutRecordRequest().
         withStreamName(streamName).
-        withData(buffer)
+        withData(buffer).
+        withPartitionKey(new String(buffer.array().take(256)))
     )
+    log.info(s"Sent to Kinesis: Seq#:${result.getSequenceNumber}")
+    result
   }
 
-  def buffersFromLambdaEvent(event: KinesisEvent): Seq[ByteBuffer] = event.getRecords.asScala.map(_.getKinesis.getData)
+  def buffersFromLambdaEvent(event: KinesisEvent): Map[String, ByteBuffer] = event.getRecords.asScala.map{ record =>
+    record.getKinesis.getSequenceNumber -> record.getKinesis.getData
+  }.toMap
 }
 

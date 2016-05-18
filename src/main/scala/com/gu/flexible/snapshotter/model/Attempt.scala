@@ -44,10 +44,10 @@ object Attempt {
     * This implementation takes the first failure for simplicity, it's possible
     * to collect all the failures when that's required.
     */
-  def sequence[A](responses: List[Attempt[A]])(implicit ec: ExecutionContext): Attempt[List[A]] = Attempt {
+  def sequence[A](responses: Seq[Attempt[A]])(implicit ec: ExecutionContext): Attempt[Seq[A]] = Attempt {
     Future.sequence(responses.map(_.underlying)).map { eithers =>
       eithers
-        .collectFirst { case scala.Left(x) => scala.Left(x): Either[AttemptErrors, List[A]]}
+        .collectFirst { case scala.Left(x) => scala.Left(x): Either[AttemptErrors, Seq[A]]}
         .getOrElse {
           scala.Right(eithers collect { case Right(x) => x})
         }
@@ -97,6 +97,9 @@ object Attempt {
   def Left[A](err: AttemptErrors): Attempt[A] =
     Attempt(Future.successful(scala.Left(err)))
 
+  def Left[A](err: AttemptError): Attempt[A] =
+    Attempt(Future.successful(scala.Left(AttemptErrors(err))))
+
   /**
     * Asyncronous versions of the Attempt Right/Left helpers for when you have
     * a Future that returns a good/bad value directly.
@@ -127,6 +130,12 @@ object Attempt {
 
 case class AttemptError(message: String, context: Option[String] = None, throwable: Option[Throwable] = None) {
   lazy val logString = s"${context.fold("")(_+": ")}$message"
+  def logTo(logger: Logger): Unit = {
+    throwable match {
+      case None => logger.error(logString)
+      case Some(t) => logger.error(logString, t)
+    }
+  }
 }
 
 case class AttemptErrors(errors: List[AttemptError])

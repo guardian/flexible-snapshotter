@@ -5,18 +5,19 @@ import java.nio.charset.StandardCharsets
 
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.{AmazonClientException, AmazonServiceException}
-import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest, SSEAwsKeyManagementParams}
+import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest, PutObjectResult, SSEAwsKeyManagementParams}
 import com.gu.flexible.snapshotter.Logging
 import com.gu.flexible.snapshotter.config.SnapshotterConfig
+import com.gu.flexible.snapshotter.model.{Attempt, AttemptError, AttemptErrors}
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json.{JsValue, Json}
 
 object S3Logic extends Logging {
-  def uploadToS3Bucket(id: String, date: DateTime, content: JsValue)(implicit s3Client: AmazonS3Client, config: SnapshotterConfig): Unit = {
+  def uploadToS3Bucket(id: String, date: DateTime, content: JsValue)(implicit s3Client: AmazonS3Client, config: SnapshotterConfig): Attempt[PutObjectResult] = {
     val jsonBytes = Json.prettyPrint(content).getBytes(StandardCharsets.UTF_8)
 
-    val key = makeKey(id, date)
+    val key = makeKey(id, date, extension = "json")
 
     val objectMetadata = new ObjectMetadata()
     objectMetadata.setContentLength(jsonBytes.length)
@@ -34,13 +35,13 @@ object S3Logic extends Logging {
 
     try {
       log.info(s"Saving content with id $id to bucket ${config.bucket} with key $key")
-      s3Client.putObject(putObjectRequest)
+      Attempt.Right(s3Client.putObject(putObjectRequest))
     } catch {
       case (e @ (_: AmazonClientException | _ : AmazonServiceException)) =>
-        log.error(s"Failed to upload document $id to bucket ${config.bucket} with key $key", e)
+        Attempt.Left(AttemptError(s"Failed to upload document $id to bucket ${config.bucket} with key $key", throwable = Some(e)))
     }
   }
 
   private[snapshotter] val isoDateTimeFormatter = ISODateTimeFormat.dateTime()
-  private[snapshotter] def makeKey(id: String, date: DateTime) = s"$id/${isoDateTimeFormatter.print(date)}"
+  private[snapshotter] def makeKey(id: String, date: DateTime, extension: String) = s"$id/${isoDateTimeFormatter.print(date)}.$extension"
 }
