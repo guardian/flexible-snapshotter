@@ -26,16 +26,6 @@ libraryDependencies ++= Seq(
 
 enablePlugins(JavaAppPackaging, RiffRaffArtifact)
 
-// remove the application itself and include the class files in the root of zip instead
-mappings in Universal := (mappings in Universal).value.filterNot{ case (file, targetFileName) =>
-  targetFileName.contains(name.value)
-}
-
-mappings in Universal ++= {
-  val cd = (classDirectory in Compile).value
-  PathFinder(cd).***.filter(cd.!=).pair(_.relativeTo(cd).map(_.toString))
-}
-
 topLevelDirectory in Universal := None
 packageName in Universal := normalizedName.value
 
