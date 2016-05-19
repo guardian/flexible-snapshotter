@@ -43,7 +43,7 @@ class SchedulingLambda extends Logging {
       contentIds = parseContentIds(apiResult)
     } yield {
       if (contentIds.nonEmpty) {
-        val batch = BatchSnapshotRequest(contentIds, SnapshotMetadata("Scheduled snapshot")))
+        val batch = BatchSnapshotRequest(contentIds, SnapshotMetadata("Scheduled snapshot"))
         val serialisedContentIds = serialiseToByteBuffer(batch)
         Some(sendToKinesis(config.kinesisStream, serialisedContentIds))
       } else None
