@@ -3,18 +3,17 @@ package com.gu.flexible.snapshotter
 import java.util.{Map => JMap}
 
 import com.amazonaws.regions.Regions
-
-import scala.concurrent.ExecutionContext.Implicits.global
+import com.amazonaws.services.kinesis.model.PutRecordResult
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.flexible.snapshotter.config.{Config, SchedulerConfig}
-import com.gu.flexible.snapshotter.logic.{ApiLogic, KinesisLogic}
-import com.gu.flexible.snapshotter.model.{BatchSnapshotRequest, SnapshotMetadata}
+import com.gu.flexible.snapshotter.logic.{ApiLogic, FutureUtils, KinesisLogic}
+import com.gu.flexible.snapshotter.model.{Attempt, BatchSnapshotRequest, SnapshotMetadata}
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}
 import org.apache.log4j.LogManager
 import play.api.libs.ws.WSClient
 
-import scala.concurrent.duration._
-import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.language.postfixOps
 
 class SchedulingLambda extends Logging {
@@ -29,34 +28,26 @@ class SchedulingLambda extends Logging {
   // this is run under a lambda cron
   def run(event: JMap[String, Object], context: Context): Unit = {
     val config = SchedulerConfig.resolve(Config.guessStage(context), context)
-    schedule(config, context)
+    val result = schedule(config, context)
+    val fin = SchedulingLambda.logResult(result)
+
+    FutureUtils.await(fin)
   }
 
-  def schedule(config: SchedulerConfig, context: Context): Unit = {
+  def schedule(config: SchedulerConfig, context: Context): Attempt[Option[PutRecordResult]] = {
     implicit val implicitConfig = config
     log.info(s"$config")
 
-    val results = for {
+    for {
       apiResult <- contentModifiedSince(fiveMinutesAgo)
       contentIds = parseContentIds(apiResult)
     } yield {
-      val snapshotRequestBatchOption = if (contentIds.nonEmpty)
-        Some(BatchSnapshotRequest(contentIds, SnapshotMetadata("Scheduled snapshot")))
-      else None
-
-      snapshotRequestBatchOption.map { batch =>
+      if (contentIds.nonEmpty) {
+        val batch = BatchSnapshotRequest(contentIds, SnapshotMetadata("Scheduled snapshot")))
         val serialisedContentIds = serialiseToByteBuffer(batch)
-        sendToKinesis(config.kinesisStream, serialisedContentIds)
-      }
+        Some(sendToKinesis(config.kinesisStream, serialisedContentIds))
+      } else None
     }
-
-    val fin = results.fold(
-      { errors =>
-        errors.errors.foreach(_.logTo(log))
-      },{kinesisResult =>
-        log.info(s"SUCCESS: $kinesisResult")
-      })
-    Await.ready(fin, 120 seconds)
   }
 
   def shutdown() = {
@@ -64,5 +55,17 @@ class SchedulingLambda extends Logging {
     kinesisClient.shutdown()
     lambdaClient.shutdown()
     wsClient.close()
+  }
+}
+
+object SchedulingLambda extends Logging {
+  def logResult(result: Attempt[Option[PutRecordResult]]): Future[Unit] = {
+    result.fold(
+      { errors =>
+        errors.errors.foreach(_.logTo(log))
+      }, { kinesisResult =>
+        log.info(s"SUCCESS: $kinesisResult")
+      }
+    )
   }
 }

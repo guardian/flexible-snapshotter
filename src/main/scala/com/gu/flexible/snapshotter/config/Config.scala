@@ -19,7 +19,7 @@ object Config {
 }
 
 object LambdaConfig {
-  def getDescriptionJson(context: Context)(implicit lambdaClient:AWSLambdaClient) = {
+  def getDescriptionJson(context: Context)(implicit lambdaClient: AWSLambdaClient) = {
     val functionMetadata = lambdaClient.getFunctionConfiguration(
       new GetFunctionConfigurationRequest()
         .withFunctionName(context.getFunctionName)
