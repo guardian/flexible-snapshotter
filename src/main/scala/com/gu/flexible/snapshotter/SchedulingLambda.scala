@@ -7,7 +7,7 @@ import com.amazonaws.services.kinesis.model.PutRecordResult
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.flexible.snapshotter.config.{Config, SchedulerConfig}
 import com.gu.flexible.snapshotter.logic.{ApiLogic, FutureUtils, KinesisLogic}
-import com.gu.flexible.snapshotter.model.{Attempt, BatchSnapshotRequest, SnapshotMetadata}
+import com.gu.flexible.snapshotter.model.{Attempt, SnapshotMetadata, SnapshotRequest}
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}
 import org.apache.log4j.LogManager
 import play.api.libs.ws.WSClient
@@ -34,19 +34,21 @@ class SchedulingLambda extends Logging {
     FutureUtils.await(fin)
   }
 
-  def schedule(config: SchedulerConfig, context: Context): Attempt[Option[PutRecordResult]] = {
+  def schedule(config: SchedulerConfig, context: Context): Attempt[Seq[PutRecordResult]] = {
     implicit val implicitConfig = config
     log.info(s"$config")
+
+    val metadata = SnapshotMetadata("Scheduled snapshot")
 
     for {
       apiResult <- contentModifiedSince(fiveMinutesAgo)
       contentIds = parseContentIds(apiResult)
+      snapshotRequests = contentIds.map(SnapshotRequest(_, metadata))
     } yield {
-      if (contentIds.nonEmpty) {
-        val batch = BatchSnapshotRequest(contentIds, SnapshotMetadata("Scheduled snapshot"))
-        val serialisedContentIds = serialiseToByteBuffer(batch)
-        Some(sendToKinesis(config.kinesisStream, serialisedContentIds))
-      } else None
+      snapshotRequests.map { request =>
+        val serialisedRequest = serialiseToByteBuffer(request)
+        sendToKinesis(config.kinesisStream, serialisedRequest)
+      }
     }
   }
 
@@ -59,12 +61,12 @@ class SchedulingLambda extends Logging {
 }
 
 object SchedulingLambda extends Logging {
-  def logResult(result: Attempt[Option[PutRecordResult]]): Future[Unit] = {
+  def logResult(result: Attempt[Seq[PutRecordResult]]): Future[Unit] = {
     result.fold(
       { errors =>
         errors.errors.foreach(_.logTo(log))
-      }, { kinesisResult =>
-        log.info(s"SUCCESS: $kinesisResult")
+      }, { kinesisResults =>
+        log.info(s"SUCCESS: $kinesisResults")
       }
     )
   }

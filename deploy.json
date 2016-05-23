@@ -5,31 +5,22 @@
       "type":"aws-lambda",
       "data":{
         "bucket": "composer-dist",
-        "functionName": "flexible-snapshotter-snapshotting-"
-      }
-    },
-    "scheduler-lambda":{
-      "type":"aws-lambda",
-      "apps": ["snapshotter-lambda"],
-      "data":{
-        "bucket": "composer-dist",
-        "functionName": "flexible-snapshotter-scheduling-",
-        "fileName": "snapshotter-lambda.zip"
+        "functionNames": [
+          "flexible-snapshotter-snapshotting-",
+          "flexible-snapshotter-scheduling-"
+        ]
       }
     }
   },
   "recipes":{
     "default":{
-      "depends":["lambda-upload", "snapshotter-update", "scheduler-update"]
+      "depends":["lambda-upload", "lambda-update"]
     },
     "lambda-upload":{
       "actions":["snapshotter-lambda.uploadLambda"]
     },
-    "snapshotter-update":{
+    "lambda-update":{
       "actions":["snapshotter-lambda.updateLambda"]
-    },
-    "scheduler-update":{
-      "actions":["scheduler-lambda.updateLambda"]
     }
   }
 }
