@@ -10,7 +10,11 @@ object SchedulingLambdaRunner extends App {
 
   val sl = new SchedulingLambda()
   val result = sl.schedule(
-    new SchedulerConfig(kinesisStream, Config.apiUrl("DEV"), Region.getRegion(Regions.EU_WEST_1)),
+    new SchedulerConfig(
+      kinesisStream,
+      Config.apiUrl("DEV"),
+      region = Region.getRegion(Regions.EU_WEST_1)
+    ),
     new FakeContext()
   )
   val fin = SchedulingLambda.logResult(result)

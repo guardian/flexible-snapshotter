@@ -14,13 +14,14 @@ val playVersion = "2.5.0"
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
   "com.amazonaws" % "aws-lambda-java-events" % "1.1.0",
-  "com.amazonaws" % "aws-lambda-java-log4j" % "1.0.0",
-  "org.slf4j" % "slf4j-log4j12" % "1.7.21",
   "com.amazonaws" % "aws-java-sdk-s3" % awsVersion,
   "com.amazonaws" % "aws-java-sdk-lambda" % awsVersion,
   "com.amazonaws" % "aws-java-sdk-kinesis" % awsVersion,
   "com.typesafe.play" %% "play-json" % playVersion,
   "com.typesafe.play" %% "play-ws" % playVersion,
+  "ch.qos.logback" % "logback-classic" % "1.1.7",
+  "net.logstash.logback" % "logstash-logback-encoder" % "4.6",
+  "com.gu" % "kinesis-logback-appender" % "1.2.0",
   "org.scalatest" %% "scalatest" % "2.2.5" % "test"
 )
 

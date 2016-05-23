@@ -2,11 +2,12 @@ package com.gu.flexible.snapshotter
 
 import java.nio.ByteBuffer
 
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.s3.model.PutObjectResult
-import com.gu.flexible.snapshotter.config.{Config, SnapshotterConfig}
+import com.gu.flexible.snapshotter.config.{Config, KinesisAppenderConfig, LogStash, SnapshotterConfig}
 import com.gu.flexible.snapshotter.logic.{ApiLogic, FutureUtils, KinesisLogic, S3Logic}
 import com.gu.flexible.snapshotter.model.{Attempt, SnapshotRequest}
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}
@@ -27,7 +28,12 @@ class SnapshottingLambda extends Logging {
   implicit val lambdaClient = AWSClientFactory.createLambdaClient
 
   def run(input: KinesisEvent, context: Context): Unit = {
-    val config = SnapshotterConfig.resolve(Config.guessStage(context), context)
+    val stage = Config.guessStage(context)
+    val config = SnapshotterConfig.resolve(stage, context)
+    config.logstashStream.foreach { stream =>
+      val config = KinesisAppenderConfig(stream, new DefaultAWSCredentialsProviderChain, region)
+      LogStash.enableLogstashKinesisHandler(config, "stack" -> "flexible", "stage" -> stage, "app" -> "snapshot-snapshotting-lambda")
+    }
     val buffers = buffersFromLambdaEvent(input)
     log.info(s"Processing sequence numbers: ${buffers.keys.toSeq}")
 
