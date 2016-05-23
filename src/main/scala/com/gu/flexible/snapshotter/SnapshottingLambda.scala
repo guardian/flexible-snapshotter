@@ -8,7 +8,7 @@ import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.s3.model.PutObjectResult
 import com.gu.flexible.snapshotter.config.{Config, SnapshotterConfig}
 import com.gu.flexible.snapshotter.logic.{ApiLogic, FutureUtils, KinesisLogic, S3Logic}
-import com.gu.flexible.snapshotter.model.{Attempt, BatchSnapshotRequest}
+import com.gu.flexible.snapshotter.model.{Attempt, SnapshotRequest}
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}
 import org.joda.time.DateTime
 
@@ -39,10 +39,9 @@ class SnapshottingLambda extends Logging {
 
   def snapshot(buffers: Seq[ByteBuffer], config: SnapshotterConfig, context: Context): Attempt[Seq[Attempt[PutObjectResult]]] = {
     implicit val implicitConfig = config
-    val snapshotRequestAttempts = buffers.map(deserialiseFromByteBuffer[BatchSnapshotRequest])
+    val snapshotRequestAttempts = buffers.map(deserialiseFromByteBuffer[SnapshotRequest])
     for {
-      batchSnapshotRequests <- Attempt.successfulAttempts(snapshotRequestAttempts)
-      snapshotRequests = batchSnapshotRequests.flatMap(_.asSnapshotRequests)
+      snapshotRequests <- Attempt.successfulAttempts(snapshotRequestAttempts)
       apiResults = snapshotRequests.map(contentForSnapshot)
       successfulApiResults <- Attempt.successfulAttempts(apiResults)
     } yield {
