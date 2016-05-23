@@ -4,11 +4,11 @@ import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
 import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.{AmazonClientException, AmazonServiceException}
 import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest, PutObjectResult, SSEAwsKeyManagementParams}
+import com.amazonaws.{AmazonClientException, AmazonServiceException}
 import com.gu.flexible.snapshotter.Logging
 import com.gu.flexible.snapshotter.config.SnapshotterConfig
-import com.gu.flexible.snapshotter.model.{Attempt, AttemptError, AttemptErrors}
+import com.gu.flexible.snapshotter.model.{Attempt, AttemptError}
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json.{JsValue, Json}
