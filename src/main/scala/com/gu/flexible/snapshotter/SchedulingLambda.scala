@@ -2,14 +2,14 @@ package com.gu.flexible.snapshotter
 
 import java.util.{Map => JMap}
 
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.kinesis.model.PutRecordResult
 import com.amazonaws.services.lambda.runtime.Context
-import com.gu.flexible.snapshotter.config.{Config, SchedulerConfig}
+import com.gu.flexible.snapshotter.config.{Config, KinesisAppenderConfig, LogStash, SchedulerConfig}
 import com.gu.flexible.snapshotter.logic.{ApiLogic, FutureUtils, KinesisLogic}
 import com.gu.flexible.snapshotter.model.{Attempt, SnapshotMetadata, SnapshotRequest}
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}
-import org.apache.log4j.LogManager
 import play.api.libs.ws.WSClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -27,7 +27,12 @@ class SchedulingLambda extends Logging {
 
   // this is run under a lambda cron
   def run(event: JMap[String, Object], context: Context): Unit = {
-    val config = SchedulerConfig.resolve(Config.guessStage(context), context)
+    val stage = Config.guessStage(context)
+    val config = SchedulerConfig.resolve(stage, context)
+    config.logstashKinesisStream.foreach { stream =>
+      val config = KinesisAppenderConfig(stream, new DefaultAWSCredentialsProviderChain(), region)
+      LogStash.enableLogstashKinesisHandler(config, "stack" -> "flexible", "stage" -> stage, "app" -> "snapshot-scheduling-lambda")
+    }
     val result = schedule(config, context)
     val fin = SchedulingLambda.logResult(result)
 
@@ -53,7 +58,6 @@ class SchedulingLambda extends Logging {
   }
 
   def shutdown() = {
-    LogManager.shutdown()
     kinesisClient.shutdown()
     lambdaClient.shutdown()
     wsClient.close()
