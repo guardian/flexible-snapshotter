@@ -3,6 +3,7 @@ package com.gu.flexible.snapshotter.logic
 import com.gu.flexible.snapshotter.model._
 import com.gu.flexible.snapshotter.Logging
 import com.gu.flexible.snapshotter.config.CommonConfig
+import net.logstash.logback.marker.Markers
 import org.joda.time.DateTime
 import play.api.http.Status
 import play.api.libs.json.{JsObject, JsValue}
@@ -19,7 +20,7 @@ object ApiLogic extends Logging {
 
   def contentForId(id: String)(implicit ws:WSClient, config:CommonConfig, context:ExecutionContext): Attempt[JsValue] = {
     val request = ws.url(s"${config.contentRawUri}/$id").withQueryString("includePreview"->"true", "includeLive"->"true")
-    log.info(s"Requesting content for ID $id")
+    log.info(Markers.append("contentId", id), s"Requesting content for ID $id")
     jsonOnOKStatus(request)
   }
 
