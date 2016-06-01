@@ -14,9 +14,7 @@ case class SnapshotterConfig(
   bucket: String,
   stage: String,
   kmsKey: Option[String] = None,
-  region: Region = Regions.getCurrentRegion) extends CommonConfig {
-  val app = "snapshotter"
-}
+  region: Region = Regions.getCurrentRegion) extends CommonConfig
 
 object SnapshotterConfig {
   def resolve(stage: String, context: Context)(implicit lambdaClient: AWSLambdaClient): SnapshotterConfig = {

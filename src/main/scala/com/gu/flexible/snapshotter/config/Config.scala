@@ -31,9 +31,8 @@ object LambdaConfig {
 trait CommonConfig {
   def region: Region
   def cloudWatchNameSpace: String = "SnapshotterLambdas"
-  def cloudWatchDimensions: Seq[(String,String)] = Seq("Stage" -> stage, "Lambda" -> app)
+  def cloudWatchDimensions: Seq[(String,String)] = Seq("Stage" -> stage)
   def stage: String
-  def app: String
 
   def apiUrl: String = Config.apiUrl(stage)
 
