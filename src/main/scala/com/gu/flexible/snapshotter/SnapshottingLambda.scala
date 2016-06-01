@@ -66,7 +66,8 @@ object SnapshottingLambda extends Logging {
     results.fold(
       { failed =>
         CloudWatchLogic.putMetricData(
-          "contentSnapshotError" -> MetricValue(failed.errors.size, MetricValue.Count)
+          // this key is referenced in the cloudformation - don't change it!
+          MetricName.contentSnapshotError -> MetricValue(failed.errors.size, MetricValue.Count)
         )
         Future.successful(failed.errors.foreach(_.logTo(log)))
       },
@@ -75,12 +76,13 @@ object SnapshottingLambda extends Logging {
           attempts.foreach {
             case Left(failures) =>
               CloudWatchLogic.putMetricData(
-                "contentSnapshotError" -> MetricValue(failures.errors.size, MetricValue.Count)
+                // this key is referenced in the cloudformation - don't change it!
+                MetricName.contentSnapshotError -> MetricValue(failures.errors.size, MetricValue.Count)
               )
               failures.errors.foreach(_.logTo(log))
             case Right(result) =>
               CloudWatchLogic.putMetricData(
-                "contentSnapshotSuccess" -> MetricValue(1.0, MetricValue.Count)
+                MetricName.contentSnapshotSuccess -> MetricValue(1.0, MetricValue.Count)
               )
               log.info(s"SUCCESS: $result")
           }

@@ -69,12 +69,12 @@ object SchedulingLambda extends Logging {
       { errors =>
         errors.errors.foreach(_.logTo(log))
         CloudWatchLogic.putMetricData(
-          "scheduledContentIdsError" -> MetricValue(errors.errors.size, MetricValue.Count)
+          MetricName.scheduledContentIdsError -> MetricValue(errors.errors.size, MetricValue.Count)
         )
       }, { kinesisResults =>
         log.info(s"SUCCESS: $kinesisResults")
         CloudWatchLogic.putMetricData(
-          "scheduledContentIdsSuccess" -> MetricValue(kinesisResults.size, MetricValue.Count)
+          MetricName.scheduledContentIdsSuccess -> MetricValue(kinesisResults.size, MetricValue.Count)
         )
       }
     )

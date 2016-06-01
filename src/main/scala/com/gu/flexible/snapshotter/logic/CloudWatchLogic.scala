@@ -13,6 +13,14 @@ object MetricValue {
 }
 case class MetricValue(value: Double, unit: String = MetricValue.None)
 
+object MetricName {
+  // these keys are referenced in the cloudformation - don't change them!
+  val contentSnapshotError = "contentSnapshotError"
+  val contentSnapshotSuccess = "contentSnapshotSuccess"
+  val scheduledContentIdsError = "scheduledContentIdsError"
+  val scheduledContentIdsSuccess = "scheduledContentIdsSuccess"
+}
+
 object CloudWatchLogic extends Logging {
   def awsDimensions(dimensions: (String, String)*) = {
     dimensions.map{ case (name, value) => new Dimension().withName(name).withValue(value) }
