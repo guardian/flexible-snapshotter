@@ -3,11 +3,12 @@ package com.gu.flexible.snapshotter
 import java.nio.ByteBuffer
 
 import com.amazonaws.regions.Regions
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.s3.model.PutObjectResult
-import com.gu.flexible.snapshotter.config.{Config, SnapshotterConfig}
-import com.gu.flexible.snapshotter.logic.{ApiLogic, FutureUtils, KinesisLogic, S3Logic}
+import com.gu.flexible.snapshotter.config.{CommonConfig, Config, SnapshotterConfig}
+import com.gu.flexible.snapshotter.logic._
 import com.gu.flexible.snapshotter.model.{Attempt, SnapshotRequest}
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}
 import org.joda.time.DateTime
@@ -25,9 +26,10 @@ class SnapshottingLambda extends Logging {
   implicit val wsClient = WSClientFactory.createClient
   implicit val s3Client = AWSClientFactory.createS3Client
   implicit val lambdaClient = AWSClientFactory.createLambdaClient
+  implicit val cloudWatchClient = AWSClientFactory.createCloudwatchClient
 
   def run(input: KinesisEvent, context: Context): Unit = {
-    val config = SnapshotterConfig.resolve(Config.guessStage(context), context)
+    implicit val config = SnapshotterConfig.resolve(Config.guessStage(context), context)
     val buffers = buffersFromLambdaEvent(input)
     log.info(s"Processing sequence numbers: ${buffers.keys.toSeq}")
 
@@ -59,14 +61,27 @@ class SnapshottingLambda extends Logging {
 }
 
 object SnapshottingLambda extends Logging {
-  def logResults(results: Attempt[Seq[Attempt[PutObjectResult]]]): Future[Unit] = {
+  def logResults(results: Attempt[Seq[Attempt[PutObjectResult]]])
+    (implicit cloudWatchClient:AmazonCloudWatchClient, config: CommonConfig): Future[Unit] = {
     results.fold(
-      { failed => Future.successful(failed.errors.foreach(_.logTo(log))) }, { succeeded =>
+      { failed =>
+        CloudWatchLogic.putMetricData(
+          "contentSnapshotError" -> MetricValue(failed.errors.size, MetricValue.Count)
+        )
+        Future.successful(failed.errors.foreach(_.logTo(log)))
+      },
+      { succeeded =>
         Future.sequence(succeeded.map(_.asFuture)).map { attempts =>
           attempts.foreach {
             case Left(failures) =>
+              CloudWatchLogic.putMetricData(
+                "contentSnapshotError" -> MetricValue(failures.errors.size, MetricValue.Count)
+              )
               failures.errors.foreach(_.logTo(log))
             case Right(result) =>
+              CloudWatchLogic.putMetricData(
+                "contentSnapshotSuccess" -> MetricValue(1.0, MetricValue.Count)
+              )
               log.info(s"SUCCESS: $result")
           }
         }

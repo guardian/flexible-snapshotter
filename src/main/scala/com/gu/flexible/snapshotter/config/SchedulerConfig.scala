@@ -12,13 +12,18 @@ case class LambdaSchedulerConfig(kinesisStream: String)
 
 case class SchedulerConfig(
   kinesisStream: String,
-  apiUrl: String,
-  region: Region = Regions.getCurrentRegion) extends CommonConfig
+  stage: String,
+  region: Region = Regions.getCurrentRegion) extends CommonConfig {
+  val app = "scheduler"
+}
 
 object SchedulerConfig {
   def resolve(stage: String, context: Context)(implicit lambdaClient: AWSLambdaClient): SchedulerConfig = {
     val lambdaJson = LambdaConfig.getDescriptionJson(context)
     val lambdaConfig = lambdaJson.as[LambdaSchedulerConfig]
-    SchedulerConfig(lambdaConfig.kinesisStream, Config.apiUrl(stage))
+    SchedulerConfig(
+      kinesisStream = lambdaConfig.kinesisStream,
+      stage = stage
+    )
   }
 }

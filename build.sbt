@@ -8,7 +8,7 @@ scalaVersion in ThisBuild := "2.11.8"
 description   := "AWS lambdas to snapshot Flexible content to S3"
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 
-val awsVersion = "1.11.0"
+val awsVersion = "1.11.5"
 val playVersion = "2.5.0"
 
 libraryDependencies ++= Seq(
@@ -19,6 +19,7 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk-s3" % awsVersion,
   "com.amazonaws" % "aws-java-sdk-lambda" % awsVersion,
   "com.amazonaws" % "aws-java-sdk-kinesis" % awsVersion,
+  "com.amazonaws" % "aws-java-sdk-cloudwatch" % awsVersion,
   "com.typesafe.play" %% "play-json" % playVersion,
   "com.typesafe.play" %% "play-ws" % playVersion,
   "org.scalatest" %% "scalatest" % "2.2.5" % "test"

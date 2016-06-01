@@ -3,10 +3,11 @@ package com.gu.flexible.snapshotter
 import java.util.{Map => JMap}
 
 import com.amazonaws.regions.Regions
+import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient
 import com.amazonaws.services.kinesis.model.PutRecordResult
 import com.amazonaws.services.lambda.runtime.Context
-import com.gu.flexible.snapshotter.config.{Config, SchedulerConfig}
-import com.gu.flexible.snapshotter.logic.{ApiLogic, FutureUtils, KinesisLogic}
+import com.gu.flexible.snapshotter.config.{CommonConfig, Config, SchedulerConfig}
+import com.gu.flexible.snapshotter.logic._
 import com.gu.flexible.snapshotter.model.{Attempt, SnapshotMetadata, SnapshotRequest}
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}
 import org.apache.log4j.LogManager
@@ -24,10 +25,11 @@ class SchedulingLambda extends Logging {
   implicit val wsClient: WSClient = WSClientFactory.createClient
   implicit val kinesisClient = AWSClientFactory.createKinesisClient
   implicit val lambdaClient = AWSClientFactory.createLambdaClient
+  implicit val cloudWatchClient = AWSClientFactory.createCloudwatchClient
 
   // this is run under a lambda cron
   def run(event: JMap[String, Object], context: Context): Unit = {
-    val config = SchedulerConfig.resolve(Config.guessStage(context), context)
+    implicit val config = SchedulerConfig.resolve(Config.guessStage(context), context)
     val result = schedule(config, context)
     val fin = SchedulingLambda.logResult(result)
 
@@ -61,12 +63,19 @@ class SchedulingLambda extends Logging {
 }
 
 object SchedulingLambda extends Logging {
-  def logResult(result: Attempt[Seq[PutRecordResult]]): Future[Unit] = {
+  def logResult(result: Attempt[Seq[PutRecordResult]])
+    (implicit cloudWatchClient:AmazonCloudWatchClient, config: CommonConfig): Future[Unit] = {
     result.fold(
       { errors =>
         errors.errors.foreach(_.logTo(log))
+        CloudWatchLogic.putMetricData(
+          "scheduledContentIdsError" -> MetricValue(errors.errors.size, MetricValue.Count)
+        )
       }, { kinesisResults =>
         log.info(s"SUCCESS: $kinesisResults")
+        CloudWatchLogic.putMetricData(
+          "scheduledContentIdsSuccess" -> MetricValue(kinesisResults.size, MetricValue.Count)
+        )
       }
     )
   }

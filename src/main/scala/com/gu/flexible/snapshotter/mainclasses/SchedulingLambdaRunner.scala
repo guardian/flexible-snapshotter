@@ -9,11 +9,15 @@ object SchedulingLambdaRunner extends App {
   val kinesisStream:String = ???
 
   val sl = new SchedulingLambda()
-  val result = sl.schedule(
-    new SchedulerConfig(kinesisStream, Config.apiUrl("DEV"), Region.getRegion(Regions.EU_WEST_1)),
-    new FakeContext()
+
+  implicit val config = new SchedulerConfig(
+    kinesisStream = kinesisStream,
+    stage = "DEV",
+    region = Region.getRegion(Regions.EU_WEST_1)
   )
-  val fin = SchedulingLambda.logResult(result)
+
+  val result = sl.schedule(config, new FakeContext())
+  val fin = SchedulingLambda.logResult(result)(sl.cloudWatchClient, config)
   FutureUtils.await(fin)
   sl.shutdown()
 }
