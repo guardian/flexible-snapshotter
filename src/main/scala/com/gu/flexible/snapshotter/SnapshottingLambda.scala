@@ -30,7 +30,7 @@ class SnapshottingLambda extends Logging {
     implicit val config = SnapshotterConfig.resolve(Config.guessStage(context), context)
 
     val requests = fromLambdaEvent(input)
-    log.info(s"Processing sequence numbers: ${requests.map(_.id)}")
+    log.info(s"Processing message IDs: ${requests.map(_.id).mkString(", ")}")
 
     val results = snapshot(requests.map(_.content), config, context)
     val fin = SnapshottingLambda.logResults(results)
