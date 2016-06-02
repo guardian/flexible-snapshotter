@@ -1,11 +1,9 @@
 package com.gu.flexible.snapshotter
 
-import java.nio.ByteBuffer
-
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient
 import com.amazonaws.services.lambda.runtime.Context
-import com.amazonaws.services.lambda.runtime.events.KinesisEvent
+import com.amazonaws.services.lambda.runtime.events.SNSEvent
 import com.amazonaws.services.s3.model.PutObjectResult
 import com.gu.flexible.snapshotter.config.{CommonConfig, Config, SnapshotterConfig}
 import com.gu.flexible.snapshotter.logic._
@@ -19,8 +17,8 @@ import scala.language.postfixOps
 
 class SnapshottingLambda extends Logging {
   import ApiLogic._
-  import KinesisLogic._
   import S3Logic._
+  import SNSLogic._
 
   implicit val region: Regions = AWSClientFactory.getRegion
   implicit val wsClient = WSClientFactory.createClient
@@ -28,20 +26,21 @@ class SnapshottingLambda extends Logging {
   implicit val lambdaClient = AWSClientFactory.createLambdaClient
   implicit val cloudWatchClient = AWSClientFactory.createCloudwatchClient
 
-  def run(input: KinesisEvent, context: Context): Unit = {
+  def run(input: SNSEvent, context: Context): Unit = {
     implicit val config = SnapshotterConfig.resolve(Config.guessStage(context), context)
-    val buffers = buffersFromLambdaEvent(input)
-    log.info(s"Processing sequence numbers: ${buffers.keys.toSeq}")
 
-    val results = snapshot(buffers.values.toSeq, config, context)
+    val requests = fromLambdaEvent(input)
+    log.info(s"Processing message IDs: ${requests.map(_.id).mkString(", ")}")
+
+    val results = snapshot(requests.map(_.content), config, context)
     val fin = SnapshottingLambda.logResults(results)
 
     FutureUtils.await(fin)
   }
 
-  def snapshot(buffers: Seq[ByteBuffer], config: SnapshotterConfig, context: Context): Attempt[Seq[Attempt[PutObjectResult]]] = {
+  def snapshot(requests: Seq[String], config: SnapshotterConfig, context: Context): Attempt[Seq[Attempt[PutObjectResult]]] = {
     implicit val implicitConfig = config
-    val snapshotRequestAttempts = buffers.map(deserialiseFromByteBuffer[SnapshotRequest])
+    val snapshotRequestAttempts = requests.map(deserialise[SnapshotRequest])
     for {
       snapshotRequests <- Attempt.successfulAttempts(snapshotRequestAttempts)
       apiResults = snapshotRequests.map(contentForSnapshot)

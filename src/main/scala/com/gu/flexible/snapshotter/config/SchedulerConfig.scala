@@ -8,10 +8,10 @@ import play.api.libs.json.{Json, Reads}
 object LambdaSchedulerConfig {
   implicit val configReads = Json.reads[LambdaSchedulerConfig]
 }
-case class LambdaSchedulerConfig(kinesisStream: String)
+case class LambdaSchedulerConfig(snsTopicArn: String)
 
 case class SchedulerConfig(
-  kinesisStream: String,
+  snsTopicArn: String,
   stage: String,
   region: Region = Regions.getCurrentRegion) extends CommonConfig
 
@@ -20,7 +20,7 @@ object SchedulerConfig {
     val lambdaJson = LambdaConfig.getDescriptionJson(context)
     val lambdaConfig = lambdaJson.as[LambdaSchedulerConfig]
     SchedulerConfig(
-      kinesisStream = lambdaConfig.kinesisStream,
+      snsTopicArn = lambdaConfig.snsTopicArn,
       stage = stage
     )
   }
