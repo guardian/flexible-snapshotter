@@ -6,12 +6,12 @@ import com.gu.flexible.snapshotter.config.{Config, SchedulerConfig}
 import com.gu.flexible.snapshotter.logic.FutureUtils
 
 object SchedulingLambdaRunner extends App {
-  val kinesisStream:String = ???
+  val snsTopicArn:String = ???
 
   val sl = new SchedulingLambda()
 
   implicit val config = new SchedulerConfig(
-    kinesisStream = kinesisStream,
+    snsTopicArn = snsTopicArn,
     stage = "DEV",
     region = Region.getRegion(Regions.EU_WEST_1)
   )

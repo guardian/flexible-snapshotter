@@ -4,8 +4,8 @@ import java.util.{Map => JMap}
 
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient
-import com.amazonaws.services.kinesis.model.PutRecordResult
 import com.amazonaws.services.lambda.runtime.Context
+import com.amazonaws.services.sns.model.PublishResult
 import com.gu.flexible.snapshotter.config.{CommonConfig, Config, SchedulerConfig}
 import com.gu.flexible.snapshotter.logic._
 import com.gu.flexible.snapshotter.model.{Attempt, SnapshotMetadata, SnapshotRequest}
@@ -19,11 +19,11 @@ import scala.language.postfixOps
 
 class SchedulingLambda extends Logging {
   import ApiLogic._
-  import KinesisLogic._
+  import SNSLogic._
 
   implicit val region: Regions = AWSClientFactory.getRegion
   implicit val wsClient: WSClient = WSClientFactory.createClient
-  implicit val kinesisClient = AWSClientFactory.createKinesisClient
+  implicit val snsClient = AWSClientFactory.createSNSClient
   implicit val lambdaClient = AWSClientFactory.createLambdaClient
   implicit val cloudWatchClient = AWSClientFactory.createCloudwatchClient
 
@@ -36,7 +36,7 @@ class SchedulingLambda extends Logging {
     FutureUtils.await(fin)
   }
 
-  def schedule(config: SchedulerConfig, context: Context): Attempt[Seq[PutRecordResult]] = {
+  def schedule(config: SchedulerConfig, context: Context): Attempt[Seq[PublishResult]] = {
     implicit val implicitConfig = config
     log.info(s"$config")
 
@@ -48,22 +48,22 @@ class SchedulingLambda extends Logging {
       snapshotRequests = contentIds.map(SnapshotRequest(_, metadata))
     } yield {
       snapshotRequests.map { request =>
-        val serialisedRequest = serialiseToByteBuffer(request)
-        sendToKinesis(config.kinesisStream, serialisedRequest)
+        val serialisedRequest = serialise(request)
+        publish(config.snsTopicArn, serialisedRequest)
       }
     }
   }
 
   def shutdown() = {
     LogManager.shutdown()
-    kinesisClient.shutdown()
+    snsClient.shutdown()
     lambdaClient.shutdown()
     wsClient.close()
   }
 }
 
 object SchedulingLambda extends Logging {
-  def logResult(result: Attempt[Seq[PutRecordResult]])
+  def logResult(result: Attempt[Seq[PublishResult]])
     (implicit cloudWatchClient:AmazonCloudWatchClient, config: CommonConfig): Future[Unit] = {
     result.fold(
       { errors =>
@@ -71,10 +71,10 @@ object SchedulingLambda extends Logging {
         CloudWatchLogic.putMetricData(
           MetricName.scheduledContentIdsError -> MetricValue(errors.errors.size, MetricValue.Count)
         )
-      }, { kinesisResults =>
-        log.info(s"SUCCESS: $kinesisResults")
+      }, { publishResults =>
+        log.info(s"SUCCESS: $publishResults")
         CloudWatchLogic.putMetricData(
-          MetricName.scheduledContentIdsSuccess -> MetricValue(kinesisResults.size, MetricValue.Count)
+          MetricName.scheduledContentIdsSuccess -> MetricValue(publishResults.size, MetricValue.Count)
         )
       }
     )
