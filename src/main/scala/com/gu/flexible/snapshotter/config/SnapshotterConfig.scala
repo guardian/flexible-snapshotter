@@ -12,7 +12,7 @@ case class LambdaSnapshotterConfig(bucket: String, kmsKey: Option[String])
 
 case class SnapshotterConfig(
   bucket: String,
-  apiUrl: String,
+  stage: String,
   kmsKey: Option[String] = None,
   region: Region = Regions.getCurrentRegion) extends CommonConfig
 
@@ -20,7 +20,11 @@ object SnapshotterConfig {
   def resolve(stage: String, context: Context)(implicit lambdaClient: AWSLambdaClient): SnapshotterConfig = {
     val lambdaJson = LambdaConfig.getDescriptionJson(context)
     val lambdaConfig = lambdaJson.as[LambdaSnapshotterConfig]
-    SnapshotterConfig(lambdaConfig.bucket, Config.apiUrl(stage), lambdaConfig.kmsKey)
+    SnapshotterConfig(
+      bucket = lambdaConfig.bucket,
+      stage = stage,
+      kmsKey = lambdaConfig.kmsKey
+    )
   }
 }
 
