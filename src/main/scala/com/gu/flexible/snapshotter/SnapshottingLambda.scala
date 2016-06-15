@@ -38,7 +38,7 @@ class SnapshottingLambda extends Logging {
     FutureUtils.await(fin)
   }
 
-  def snapshot(requests: Seq[String], config: SnapshotterConfig, context: Context): Attempt[Seq[Attempt[PutObjectResult]]] = {
+  def snapshot(requests: Seq[String], config: SnapshotterConfig, context: Context): Attempt[Seq[(Attempt[PutObjectResult], Attempt[PutObjectResult])]] = {
     implicit val implicitConfig = config
     val snapshotRequestAttempts = requests.map(deserialise[SnapshotRequest])
     for {
@@ -47,7 +47,13 @@ class SnapshottingLambda extends Logging {
       successfulApiResults <- Attempt.successfulAttempts(apiResults)
     } yield {
       successfulApiResults.map{ snapshot =>
-        uploadToS3Bucket(snapshot.id, new DateTime(), snapshot.snapshotDocument)
+        val snapshotTime = new DateTime()
+        val snapshotKey = makeKey(snapshot.id, snapshotTime, "json")
+        val snapshotSummaryKey = makeKey(snapshot.id, snapshotTime, "summary.json")
+        (
+          uploadToS3Bucket(snapshotKey, snapshot.data),
+          uploadToS3Bucket(snapshotSummaryKey, snapshot.summaryData)
+        )
       }
     }
   }
@@ -60,33 +66,42 @@ class SnapshottingLambda extends Logging {
 }
 
 object SnapshottingLambda extends Logging {
-  def logResults(results: Attempt[Seq[Attempt[PutObjectResult]]])
+  import MetricName._
+
+  def logResults(results: Attempt[Seq[(Attempt[PutObjectResult],Attempt[PutObjectResult])]])
     (implicit cloudWatchClient:AmazonCloudWatchClient, config: CommonConfig): Future[Unit] = {
     results.fold(
       { failed =>
         CloudWatchLogic.putMetricData(
-          // this key is referenced in the cloudformation - don't change it!
           MetricName.contentSnapshotError -> MetricValue(failed.errors.size, MetricValue.Count)
         )
         Future.successful(failed.errors.foreach(_.logTo(log)))
       },
       { succeeded =>
-        Future.sequence(succeeded.map(_.asFuture)).map { attempts =>
-          attempts.foreach {
-            case Left(failures) =>
-              CloudWatchLogic.putMetricData(
-                // this key is referenced in the cloudformation - don't change it!
-                MetricName.contentSnapshotError -> MetricValue(failures.errors.size, MetricValue.Count)
-              )
-              failures.errors.foreach(_.logTo(log))
-            case Right(result) =>
-              CloudWatchLogic.putMetricData(
-                MetricName.contentSnapshotSuccess -> MetricValue(1.0, MetricValue.Count)
-              )
-              log.info(s"SUCCESS: $result")
-          }
-        }
+        val data = succeeded.map(_._1)
+        val summaries = succeeded.map(_._2)
+        logResultsAttempts(data, Some(contentSnapshotSuccess), Some(contentSnapshotError))
+        logResultsAttempts(summaries)
       }
     ).flatMap(identity)
+  }
+
+  def logResultsAttempts(succeeded: Seq[Attempt[PutObjectResult]], successMetric: Option[MetricName] = None,
+    failureMetric: Option[MetricName] = None)(implicit cloudWatchClient:AmazonCloudWatchClient, config: CommonConfig): Future[Unit] = {
+    Future.sequence(succeeded.map(_.asFuture)).map { attempts =>
+      attempts.foreach {
+        case Left(failures) =>
+          failureMetric.map { metric =>
+            CloudWatchLogic.putMetricData(metric -> MetricValue(failures.errors.size, MetricValue.Count))
+          }
+          failures.errors.foreach(_.logTo(log))
+        case Right(result) =>
+          successMetric.map { metric =>
+            CloudWatchLogic.putMetricData(metric -> MetricValue(1.0, MetricValue.Count)
+            )
+          }
+          log.info(s"SUCCESS: $result")
+      }
+    }
   }
 }
