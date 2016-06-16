@@ -49,7 +49,7 @@ class SnapshottingLambda extends Logging {
       successfulApiResults.map{ snapshot =>
         val snapshotTime = new DateTime()
         val snapshotKey = makeKey(snapshot.id, snapshotTime, "json")
-        val snapshotSummaryKey = makeKey(snapshot.id, snapshotTime, "summary.json")
+        val snapshotSummaryKey = makeKey(snapshot.id, snapshotTime, "info.json")
         (
           uploadToS3Bucket(snapshotKey, snapshot.data),
           uploadToS3Bucket(snapshotSummaryKey, snapshot.summaryData)
