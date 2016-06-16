@@ -5,11 +5,9 @@ import play.api.libs.json._
 import scala.language.postfixOps
 
 case class Snapshot(id: String, metadata: SnapshotMetadata, data: JsValue) {
-  val summaryData: JsObject = Json.obj(
-    "reason" -> JsString(metadata.reason)
-  ) ++ JsObject(Snapshot.fieldsToExtract.flatMap { field =>
-    Snapshot.extractField(data, field).map(field ->)
-  })
+  val summaryMetadata: JsObject = Json.obj("reason" -> JsString(metadata.reason))
+  val summaryFields: JsObject = Snapshot.fieldsToExtract.flatMap(Snapshot.soloField(data, _)).foldLeft(Json.obj())(_++_)
+  val summaryData: JsObject = Json.obj("metadata" -> summaryMetadata, "summary" -> summaryFields)
 }
 
 object Snapshot {
@@ -21,12 +19,15 @@ object Snapshot {
     "preview.settings.legallySensitive",
     "published",
     "scheduledLaunchDate",
-    "preview.settings.embargoedUntil"
-  )
+    "preview.settings.embargoedUntil",
+    "contentChangeDetails.published"
+  ).map(_.split("\\.").toSeq)
 
-  def extractField(json: JsLookup, field: String): Option[JsValue] = {
-    field.split("\\.").foldLeft(json) {
-      case (js, component) => js \ component
-    }.result.toOption
+  def soloField(json: JsLookup, field: Seq[String]): Option[JsObject] = {
+    field match {
+      case head :: Nil => (json \ head).toOption.map(obj => Json.obj(head -> obj))
+      case head :: tail => soloField(json \ head, tail).map(obj => Json.obj(head -> obj))
+      case _ => None
+    }
   }
 }
