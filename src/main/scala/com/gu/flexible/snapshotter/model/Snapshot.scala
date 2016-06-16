@@ -6,7 +6,8 @@ import scala.language.postfixOps
 
 case class Snapshot(id: String, metadata: SnapshotMetadata, data: JsValue) {
   val summaryMetadata: JsObject = Json.obj("reason" -> JsString(metadata.reason))
-  val summaryFields: JsObject = Snapshot.fieldsToExtract.flatMap(Snapshot.soloField(data, _)).foldLeft(Json.obj())(_++_)
+  val summaryFields: JsObject = Snapshot.fieldsToExtract.flatMap(Snapshot.soloField(data, _)).
+    foldLeft(Json.obj())(_ deepMerge _)
   val summaryData: JsObject = Json.obj("metadata" -> summaryMetadata, "summary" -> summaryFields)
 }
 
