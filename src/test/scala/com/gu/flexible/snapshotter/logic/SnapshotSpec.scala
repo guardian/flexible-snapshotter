@@ -17,17 +17,17 @@ class SnapshotSpec extends FlatSpec with ShouldMatchers {
   )
 
   "soloField" should "extract a single field from a tree" in {
-    val result = Snapshot.soloField(testJson, Seq("test1", "field1a"))
+    val result = Snapshot.soloField(testJson, List("test1", "field1a"))
     result should be(Some(Json.obj("test1" -> Json.obj("field1a" -> JsString("bubbles")))))
   }
 
   it should "return none if part of the path doesn't exist" in {
-    val result = Snapshot.soloField(testJson, Seq("test3", "field1a"))
+    val result = Snapshot.soloField(testJson, List("test3", "field1a"))
     result should be(None)
   }
 
   it should "return a subtree if the path ends with an object" in {
-    val result = Snapshot.soloField(testJson, Seq("test1"))
+    val result = Snapshot.soloField(testJson, List("test1"))
     result should be(Some(Json.obj(
       "test1" -> Json.obj(
         "field1a" -> JsString("bubbles"),

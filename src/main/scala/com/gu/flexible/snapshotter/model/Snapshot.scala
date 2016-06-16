@@ -21,9 +21,9 @@ object Snapshot {
     "scheduledLaunchDate",
     "preview.settings.embargoedUntil",
     "contentChangeDetails.published"
-  ).map(_.split("\\.").toSeq)
+  ).map(_.split("\\.").toList)
 
-  def soloField(json: JsLookup, field: Seq[String]): Option[JsObject] = {
+  def soloField(json: JsLookup, field: List[String]): Option[JsObject] = {
     field match {
       case head :: Nil => (json \ head).toOption.map(obj => Json.obj(head -> obj))
       case head :: tail => soloField(json \ head, tail).map(obj => Json.obj(head -> obj))
