@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext
 object ApiLogic extends Logging {
   def contentForSnapshot(snapshotRequest: SnapshotRequest)(implicit ws:WSClient, config:CommonConfig, context:ExecutionContext): Attempt[Snapshot] = {
     contentForId(snapshotRequest.contentId).map{ json =>
-      Snapshot(snapshotRequest.contentId, snapshotRequest.metadata, json)
+      Snapshot(snapshotRequest.contentId, snapshotRequest.metadata, json, config.fieldsToExtract)
     }
   }
 

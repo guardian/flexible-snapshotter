@@ -16,6 +16,18 @@ object Config {
     context.getFunctionName.split(Array('-','_')).toList.filter(_.length > 0).lastOption.getOrElse {
       throw new IllegalArgumentException(s"Couldn't guess stage from function name ${context.getFunctionName}")
     }
+
+  val defaultFieldsToExtract = List(
+    "preview.fields.headline",
+    "preview.settings.commentable",
+    "type",
+    "preview.settings.liveBloggingNow",
+    "preview.settings.legallySensitive",
+    "published",
+    "scheduledLaunchDate",
+    "preview.settings.embargoedUntil",
+    "contentChangeDetails.published"
+  ).map(_.split("\\.").toList)
 }
 
 object LambdaConfig {
@@ -38,4 +50,6 @@ trait CommonConfig {
 
   def contentUri = s"$apiUrl/content"
   def contentRawUri = s"$apiUrl/contentRaw"
+
+  def fieldsToExtract = Config.defaultFieldsToExtract
 }

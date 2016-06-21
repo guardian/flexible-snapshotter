@@ -14,10 +14,15 @@ import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json.{JsValue, Json}
 
 object S3Logic extends Logging {
-  def uploadToS3Bucket(id: String, date: DateTime, content: JsValue)(implicit s3Client: AmazonS3Client, config: SnapshotterConfig): Attempt[PutObjectResult] = {
-    val jsonBytes = Json.prettyPrint(content).getBytes(StandardCharsets.UTF_8)
-
+  def uploadToS3Bucket(id: String, date: DateTime, content: JsValue)
+    (implicit s3Client: AmazonS3Client, config: SnapshotterConfig): Attempt[PutObjectResult] = {
     val key = makeKey(id, date, extension = "json")
+    uploadToS3Bucket(key, content)
+  }
+
+  def uploadToS3Bucket(key: String, content: JsValue)
+    (implicit s3Client: AmazonS3Client, config: SnapshotterConfig): Attempt[PutObjectResult] = {
+    val jsonBytes = Json.prettyPrint(content).getBytes(StandardCharsets.UTF_8)
 
     val objectMetadata = new ObjectMetadata()
     objectMetadata.setContentLength(jsonBytes.length)
@@ -34,11 +39,11 @@ object S3Logic extends Logging {
     ).withSSEAwsKeyManagementParams(keyManagementParams)
 
     try {
-      log.info(s"Saving content with id $id to bucket ${config.bucket} with key $key")
+      log.info(s"Saving content to bucket ${config.bucket} with key $key")
       Attempt.Right(s3Client.putObject(putObjectRequest))
     } catch {
       case (e @ (_: AmazonClientException | _ : AmazonServiceException)) =>
-        Attempt.Left(AttemptError(s"Failed to upload document $id to bucket ${config.bucket} with key $key", throwable = Some(e)))
+        Attempt.Left(AttemptError(s"Failed to upload to bucket ${config.bucket} with key $key", throwable = Some(e)))
     }
   }
 

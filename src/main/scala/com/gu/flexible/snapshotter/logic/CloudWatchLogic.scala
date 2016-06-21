@@ -14,11 +14,13 @@ object MetricValue {
 case class MetricValue(value: Double, unit: String = MetricValue.None)
 
 object MetricName {
+  type MetricName = String
+
   // these keys are referenced in the cloudformation - don't change them!
-  val contentSnapshotError = "contentSnapshotError"
-  val contentSnapshotSuccess = "contentSnapshotSuccess"
-  val scheduledContentIdsError = "scheduledContentIdsError"
-  val scheduledContentIdsSuccess = "scheduledContentIdsSuccess"
+  val contentSnapshotError: MetricName = "contentSnapshotError"
+  val contentSnapshotSuccess: MetricName = "contentSnapshotSuccess"
+  val scheduledContentIdsError: MetricName = "scheduledContentIdsError"
+  val scheduledContentIdsSuccess: MetricName = "scheduledContentIdsSuccess"
 }
 
 object CloudWatchLogic extends Logging {
