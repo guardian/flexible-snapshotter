@@ -4,26 +4,14 @@ import play.api.libs.json._
 
 import scala.language.postfixOps
 
-case class Snapshot(id: String, metadata: SnapshotMetadata, data: JsValue) {
+case class Snapshot(id: String, metadata: SnapshotMetadata, data: JsValue, fieldsToExtract: List[List[String]]) {
   val summaryMetadata: JsObject = Json.obj("reason" -> JsString(metadata.reason))
-  val summaryFields: JsObject = Snapshot.fieldsToExtract.flatMap(Snapshot.soloField(data, _)).
+  val summaryFields: JsObject = fieldsToExtract.flatMap(Snapshot.soloField(data, _)).
     foldLeft(Json.obj())(_ deepMerge _)
   val summaryData: JsObject = Json.obj("metadata" -> summaryMetadata, "summary" -> summaryFields)
 }
 
 object Snapshot {
-  val fieldsToExtract = List(
-    "preview.fields.headline",
-    "preview.settings.commentable",
-    "type",
-    "preview.settings.liveBloggingNow",
-    "preview.settings.legallySensitive",
-    "published",
-    "scheduledLaunchDate",
-    "preview.settings.embargoedUntil",
-    "contentChangeDetails.published"
-  ).map(_.split("\\.").toList)
-
   def soloField(json: JsLookup, field: List[String]): Option[JsObject] = {
     field match {
       case head :: Nil => (json \ head).toOption.map(obj => Json.obj(head -> obj))

@@ -7,10 +7,10 @@ import com.gu.flexible.snapshotter.logic.{FutureUtils, SNSLogic}
 import com.gu.flexible.snapshotter.model.{SnapshotMetadata, SnapshotRequest}
 
 object SnapshottingLambdaRunner extends App {
-  val bucket:String = ???
+  val bucket:String = "flexible-snapshotter-code"
 
   val sl = new SnapshottingLambda()
-  val input:Seq[String] = Seq(SNSLogic.serialise(SnapshotRequest("572dda3af7d0f2a7e4bbfb73", SnapshotMetadata("Testing"))))
+  val input:Seq[String] = Seq(SNSLogic.serialise(SnapshotRequest("57431375f7d04d8e107ab19e", SnapshotMetadata("Testing"))))
   val config = new SnapshotterConfig(
     bucket = bucket,
     stage = "DEV",
