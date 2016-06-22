@@ -8,11 +8,12 @@ import play.api.libs.json.{Json, Reads}
 object LambdaSchedulerConfig {
   implicit val configReads = Json.reads[LambdaSchedulerConfig]
 }
-case class LambdaSchedulerConfig(snsTopicArn: String)
+case class LambdaSchedulerConfig(snsTopicArn: String, stack: String)
 
 case class SchedulerConfig(
   snsTopicArn: String,
   stage: String,
+  stack: String,
   region: Region = Regions.getCurrentRegion) extends CommonConfig
 
 object SchedulerConfig {
@@ -21,7 +22,8 @@ object SchedulerConfig {
     val lambdaConfig = lambdaJson.as[LambdaSchedulerConfig]
     SchedulerConfig(
       snsTopicArn = lambdaConfig.snsTopicArn,
-      stage = stage
+      stage = stage,
+      stack = lambdaConfig.stack
     )
   }
 }

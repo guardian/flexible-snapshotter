@@ -7,11 +7,13 @@ import com.gu.flexible.snapshotter.logic.FutureUtils
 
 object SchedulingLambdaRunner extends App {
   val snsTopicArn:String = ???
+  val stack:String = ???
 
   val sl = new SchedulingLambda()
 
   implicit val config = new SchedulerConfig(
     snsTopicArn = snsTopicArn,
+    stack = stack,
     stage = "DEV",
     region = Region.getRegion(Regions.EU_WEST_1)
   )
