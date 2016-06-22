@@ -8,12 +8,15 @@ import com.gu.flexible.snapshotter.model.{SnapshotMetadata, SnapshotRequest}
 
 object SnapshottingLambdaRunner extends App {
   val bucket:String = "flexible-snapshotter-code"
+  val stack:String = ???
+
 
   val sl = new SnapshottingLambda()
   val input:Seq[String] = Seq(SNSLogic.serialise(SnapshotRequest("57431375f7d04d8e107ab19e", SnapshotMetadata("Testing"))))
   val config = new SnapshotterConfig(
     bucket = bucket,
     stage = "DEV",
+    stack = stack,
     region = Region.getRegion(Regions.EU_WEST_1)
   )
   val results = sl.snapshot(input,
