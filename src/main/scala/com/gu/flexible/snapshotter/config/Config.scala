@@ -4,6 +4,7 @@ import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.lambda.AWSLambdaClient
 import com.amazonaws.services.lambda.model.GetFunctionConfigurationRequest
 import com.amazonaws.services.lambda.runtime.Context
+import com.gu.flexible.snapshotter.Logging
 import play.api.libs.json.Json
 
 object Config {
@@ -32,12 +33,13 @@ object Config {
   ).map(_.split("\\.").toList)
 }
 
-object LambdaConfig {
+object LambdaConfig extends Logging {
   def getDescriptionJson(context: Context)(implicit lambdaClient: AWSLambdaClient) = {
     val functionMetadata = lambdaClient.getFunctionConfiguration(
       new GetFunctionConfigurationRequest()
         .withFunctionName(context.getFunctionName)
     )
+    log.info(functionMetadata.getDescription)
     Json.parse(functionMetadata.getDescription)
   }
 }
