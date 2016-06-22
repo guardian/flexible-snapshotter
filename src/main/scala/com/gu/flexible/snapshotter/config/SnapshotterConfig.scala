@@ -13,6 +13,7 @@ case class LambdaSnapshotterConfig(bucket: String, kmsKey: Option[String])
 case class SnapshotterConfig(
   bucket: String,
   stage: String,
+  stack: String = "",
   kmsKey: Option[String] = None,
   region: Region = Regions.getCurrentRegion) extends CommonConfig
 

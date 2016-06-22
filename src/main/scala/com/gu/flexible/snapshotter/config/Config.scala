@@ -7,8 +7,10 @@ import com.amazonaws.services.lambda.runtime.Context
 import play.api.libs.json.Json
 
 object Config {
-  def apiUrl(stage: String): String = stage match {
-    case "PROD" => "http://internal-Flexible-ApiLoadB-1QAHGRQLH03UW-649659201.eu-west-1.elb.amazonaws.com:8080"
+  def apiUrl(stage: String, stack: String): String = (stage, stack) match {
+    case ("PROD", "flexible")  => "http://internal-Flexible-ApiLoadB-1QAHGRQLH03UW-649659201.eu-west-1.elb.amazonaws.com:8080"
+    case ("PROD", "flexible-secondary") => "http://internal-Flexible-ApiLoadB-1NYF8NMK5QNMP-231637936.eu-west-1.elb.amazonaws.com:8080"
+    case ("CODE", "flexible-secondary") => "http://internal-Flexible-ApiLoadB-1LO2GC5WZ5S09-11639498.eu-west-1.elb.amazonaws.com:8080"
     case _ => "http://internal-Flexible-ApiLoadB-15RTA1C81ZYGU-432053948.eu-west-1.elb.amazonaws.com:8080"
   }
 
@@ -45,8 +47,9 @@ trait CommonConfig {
   def cloudWatchNameSpace: String = "SnapshotterLambdas"
   def cloudWatchDimensions: Seq[(String,String)] = Seq("Stage" -> stage)
   def stage: String
+  def stack: String
 
-  def apiUrl: String = Config.apiUrl(stage)
+  def apiUrl: String = Config.apiUrl(stage, stack)
 
   def contentUri = s"$apiUrl/content"
   def contentRawUri = s"$apiUrl/contentRaw"
