@@ -42,6 +42,10 @@ data file the snapshotter stores a second file called `<contentId>/<timestamp>.i
 (such as the reason in the request) and certain summary fields that are extracted from the main JSON. These summary
 fields are used to provide useful information about available snapshots without having to load them all into memory.
 
+=== Running in AWS
+
+Use the CloudFormation in the platform repo to stand this up for production.
+
 === Running locally
 
 There are two mainclasses that can be used to run the Lambda locally for troubleshooting. This doesn't exercise the
