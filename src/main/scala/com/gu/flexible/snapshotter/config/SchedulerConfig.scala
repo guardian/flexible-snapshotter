@@ -21,7 +21,6 @@ object SchedulerConfig extends Logging {
   def resolve(stage: String, context: Context)(implicit lambdaClient: AWSLambdaClient): SchedulerConfig = {
     val lambdaJson = LambdaConfig.getDescriptionJson(context)
     val lambdaConfig = lambdaJson.as[LambdaSchedulerConfig]
-    log.info(lambdaConfig.toString)
     SchedulerConfig(
       snsTopicArn = lambdaConfig.snsTopicArn,
       stage = stage,

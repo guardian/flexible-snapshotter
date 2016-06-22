@@ -39,7 +39,6 @@ object LambdaConfig extends Logging {
       new GetFunctionConfigurationRequest()
         .withFunctionName(context.getFunctionName)
     )
-    log.info(functionMetadata.getDescription)
     Json.parse(functionMetadata.getDescription)
   }
 }
