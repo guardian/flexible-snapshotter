@@ -9,15 +9,13 @@ Snapshotter schematic
 ----
                  +-----------+    Requests     +-------------+       +----+
                  |           |                 |             |       |    |
-CloudWatch +---> | Scheduler | +---> SNS +---> | Snapshotter | +---> | S3 |
+CloudWatch +-----> Scheduler +-----> SNS +-----> Snapshotter +-------> S3 |
 CRON             |           |                 |             |       |    |
-                 +-----------+                 +-------------+       +----+
-
-                       +                             +
+                 +-----+-----+                 +-----+-------+       +----+
                        |                             |
-        Content <5m?   |                             |  Content
+        Content ^5m?   |                             |  Content
                        |         +----------+        |
-                       +-------> |          | <------+
+                       +--------->          <--------+
                                  | Flexible |
                                  | API      |
                                  |          |
