@@ -3,3 +3,48 @@
 This is a lambda version of the composer-snapshotter project. This lambda 
 variant will hopefully supersede the Play! variant at some stage.
 
+The repo is composed of two lambdas: the scheduler and the snapshotter.
+
+Snapshotter schematic
+----
+                 +-----------+    Requests     +-------------+       +----+
+                 |           |                 |             |       |    |
+CloudWatch +-----> Scheduler +-----> SNS +-----> Snapshotter +-------> S3 |
+CRON             |           |                 |             |       |    |
+                 +-----+-----+                 +-----+-------+       +----+
+                       |                             |
+        Content ^5m?   |                             |  Content
+                       |         +----------+        |
+                       +--------->          <--------+
+                                 | Flexible |
+                                 | API      |
+                                 |          |
+                                 +----------+
+----
+
+=== Scheduler
+
+The scheduler is run every five minutes using a CloudWatch event cron. When it runs it queries the Flexible Content API
+for any content that has changed in the last five minutes.
+
+For each content ID that has been modified it posts a message to an SNS topic giving the content ID and the reason
+(scheduled snapshot).
+
+=== Snapshotter
+
+The snapshotter lambda fires on each request sent to the SNS topic. For each incoming request it makes a call to the
+Flexible API to get a complete copy of the piece of content at that moment (both live and preview facets).
+
+It then stores the result as is in the configured S3 bucket using a key `<contentId>/<timestamp>.json`. Alongside the
+data file the snapshotter stores a second file called `<contentId>/<timestamp>.info.json` - which contains metadata
+(such as the reason in the request) and certain summary fields that are extracted from the main JSON. These summary
+fields are used to provide useful information about available snapshots without having to load them all into memory.
+
+=== Running in AWS
+
+Use the CloudFormation in the platform repo to stand this up for production.
+
+=== Running locally
+
+There are two mainclasses that can be used to run the Lambda locally for troubleshooting. This doesn't exercise the
+configuration mechanism as the config is provided in the mainclasses.
