@@ -3,11 +3,12 @@
   "packages" : {
     "snapshotter-lambda":{
       "type":"aws-lambda",
+      "prefixStack": true,
       "data":{
         "bucket": "composer-dist",
         "functionNames": [
-          "flexible-snapshotter-snapshotting-",
-          "flexible-snapshotter-scheduling-"
+          "-snapshotter-snapshotting-",
+          "-snapshotter-scheduling-"
         ]
       }
     }
