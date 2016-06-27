@@ -3,9 +3,9 @@
   "packages" : {
     "snapshotter-lambda":{
       "type":"aws-lambda",
-      "prefixStack": true,
       "data":{
         "bucket": "composer-dist",
+        "prefixStack": true,
         "functionNames": [
           "-snapshotter-snapshotting-",
           "-snapshotter-scheduling-"
