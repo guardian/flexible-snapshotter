@@ -8,12 +8,7 @@ import com.gu.flexible.snapshotter.Logging
 import play.api.libs.json.Json
 
 object Config {
-  def apiUrl(stage: String, stack: String): String = (stage, stack) match {
-    case ("PROD", "flexible")  => "http://internal-Flexible-ApiLoadB-1QAHGRQLH03UW-649659201.eu-west-1.elb.amazonaws.com:8080"
-    case ("PROD", "flexible-secondary") => "http://internal-Flexible-ApiLoadB-1NYF8NMK5QNMP-231637936.eu-west-1.elb.amazonaws.com:8080"
-    case ("CODE", "flexible-secondary") => "http://internal-Flexible-ApiLoadB-1LO2GC5WZ5S09-11639498.eu-west-1.elb.amazonaws.com:8080"
-    case _ => "http://internal-Flexible-ApiLoadB-15RTA1C81ZYGU-432053948.eu-west-1.elb.amazonaws.com:8080"
-  }
+  def apiUrl(stage: String, stack: String): String = s"api.${stage.toLowerCase}.${stack.toLowerCase}.gudiscovery.:8080"
 
   def guessStage(context: Context): String =
     context.getFunctionName.split(Array('-','_')).toList.filter(_.length > 0).lastOption.getOrElse {
