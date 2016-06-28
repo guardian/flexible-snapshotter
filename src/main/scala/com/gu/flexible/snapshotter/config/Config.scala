@@ -4,13 +4,11 @@ import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.lambda.AWSLambdaClient
 import com.amazonaws.services.lambda.model.GetFunctionConfigurationRequest
 import com.amazonaws.services.lambda.runtime.Context
+import com.gu.flexible.snapshotter.Logging
 import play.api.libs.json.Json
 
 object Config {
-  def apiUrl(stage: String): String = stage match {
-    case "PROD" => "http://internal-Flexible-ApiLoadB-1QAHGRQLH03UW-649659201.eu-west-1.elb.amazonaws.com:8080"
-    case _ => "http://internal-Flexible-ApiLoadB-15RTA1C81ZYGU-432053948.eu-west-1.elb.amazonaws.com:8080"
-  }
+  def apiUrl(stage: String, stack: String): String = s"http://api.${stage.toLowerCase}.${stack.toLowerCase}.gudiscovery.:8080"
 
   def guessStage(context: Context): String =
     context.getFunctionName.split(Array('-','_')).toList.filter(_.length > 0).lastOption.getOrElse {
@@ -30,7 +28,7 @@ object Config {
   ).map(_.split("\\.").toList)
 }
 
-object LambdaConfig {
+object LambdaConfig extends Logging {
   def getDescriptionJson(context: Context)(implicit lambdaClient: AWSLambdaClient) = {
     val functionMetadata = lambdaClient.getFunctionConfiguration(
       new GetFunctionConfigurationRequest()
@@ -45,8 +43,9 @@ trait CommonConfig {
   def cloudWatchNameSpace: String = "SnapshotterLambdas"
   def cloudWatchDimensions: Seq[(String,String)] = Seq("Stage" -> stage)
   def stage: String
+  def stack: String
 
-  def apiUrl: String = Config.apiUrl(stage)
+  def apiUrl: String = Config.apiUrl(stage, stack)
 
   def contentUri = s"$apiUrl/content"
   def contentRawUri = s"$apiUrl/contentRaw"

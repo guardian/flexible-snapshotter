@@ -8,11 +8,12 @@ import play.api.libs.json.Json
 object LambdaSnapshotterConfig {
   implicit val configReads = Json.reads[LambdaSnapshotterConfig]
 }
-case class LambdaSnapshotterConfig(bucket: String, kmsKey: Option[String])
+case class LambdaSnapshotterConfig(bucket: String, stack: String, kmsKey: Option[String])
 
 case class SnapshotterConfig(
   bucket: String,
   stage: String,
+  stack: String,
   kmsKey: Option[String] = None,
   region: Region = Regions.getCurrentRegion) extends CommonConfig
 
@@ -23,7 +24,8 @@ object SnapshotterConfig {
     SnapshotterConfig(
       bucket = lambdaConfig.bucket,
       stage = stage,
-      kmsKey = lambdaConfig.kmsKey
+      kmsKey = lambdaConfig.kmsKey,
+      stack = lambdaConfig.stack
     )
   }
 }

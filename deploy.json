@@ -1,13 +1,14 @@
 {
-  "defaultStacks" : ["flexible"],
+  "defaultStacks" : ["flexible", "flexible-secondary"],
   "packages" : {
     "snapshotter-lambda":{
       "type":"aws-lambda",
       "data":{
         "bucket": "composer-dist",
+        "prefixStack": true,
         "functionNames": [
-          "flexible-snapshotter-snapshotting-",
-          "flexible-snapshotter-scheduling-"
+          "-snapshotter-snapshotting-",
+          "-snapshotter-scheduling-"
         ]
       }
     }

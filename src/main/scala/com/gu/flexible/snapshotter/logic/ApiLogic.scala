@@ -19,7 +19,7 @@ object ApiLogic extends Logging {
 
   def contentForId(id: String)(implicit ws:WSClient, config:CommonConfig, context:ExecutionContext): Attempt[JsValue] = {
     val request = ws.url(s"${config.contentRawUri}/$id").withQueryString("includePreview"->"true", "includeLive"->"true")
-    log.info(s"Requesting content for ID $id")
+    log.info(s"Requesting content for ID $id in stage ${config.stage} stack ${config.stack}")
     jsonOnOKStatus(request)
   }
 
