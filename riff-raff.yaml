@@ -1,21 +1,16 @@
-stacks: [flexible, flexible-secondary]
 regions: [eu-west-1]
-
-templates:
-    snapshotter-lambda:
-      type: aws-lambda
-      app: snapshotter-lambda
-      contentDirectory: snapshotter-lambda
-      parameters:
-        bucket: composer-dist
-        functionNames: [-snapshotter-snapshotting-, -snapshotter-scheduling-]
-        fileName: snapshotter-lambda.zip
+stacks:
+- flexible
+- flexible-secondary
 
 deployments:
-  snapshotter-lambda-upload:
-    template: snapshotter-lambda
-    actions: [uploadLambda]
-  snapshotter-lambda-update:
-    template: snapshotter-lambda
-    actions: [updateLambda]
-    dependencies: [snapshotter-lambda-upload]
+  snapshotter-lambda:
+    parameters:
+      functionNames:
+      - -snapshotter-snapshotting-
+      - -snapshotter-scheduling-
+      fileName: snapshotter-lambda.zip
+      bucket: composer-dist
+    type: aws-lambda
+regions:
+- eu-west-1
