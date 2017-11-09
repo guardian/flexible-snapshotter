@@ -25,6 +25,7 @@ object Config {
     "scheduledLaunchDate",
     "preview.settings.embargoedUntil",
     "contentChangeDetails.published",
+    "contentChangeDetails.lastModified",
     "contentChangeDetails.revision"
   ).map(_.split("\\.").toList)
 }
