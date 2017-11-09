@@ -1,0 +1,16 @@
+regions: [eu-west-1]
+stacks:
+- flexible
+- flexible-secondary
+
+deployments:
+  snapshotter-lambda:
+    parameters:
+      functionNames:
+      - -snapshotter-snapshotting-
+      - -snapshotter-scheduling-
+      fileName: snapshotter-lambda.zip
+      bucket: composer-dist
+    type: aws-lambda
+regions:
+- eu-west-1
