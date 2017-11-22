@@ -13,7 +13,6 @@ import org.joda.time.DateTime
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.language.postfixOps
 
 class SnapshottingLambda extends Logging {
   import ApiLogic._

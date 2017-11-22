@@ -2,7 +2,7 @@ package com.gu.flexible.snapshotter.mainclasses
 
 import com.amazonaws.regions.{Region, Regions}
 import com.gu.flexible.snapshotter.SchedulingLambda
-import com.gu.flexible.snapshotter.config.{Config, SchedulerConfig}
+import com.gu.flexible.snapshotter.config.SchedulerConfig
 import com.gu.flexible.snapshotter.logic.FutureUtils
 
 object SchedulingLambdaRunner extends App {

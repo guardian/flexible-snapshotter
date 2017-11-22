@@ -4,7 +4,7 @@ import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.lambda.AWSLambdaClient
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.flexible.snapshotter.Logging
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.Json
 
 object LambdaSchedulerConfig {
   implicit val configReads = Json.reads[LambdaSchedulerConfig]

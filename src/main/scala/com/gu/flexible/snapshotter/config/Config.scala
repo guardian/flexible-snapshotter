@@ -1,6 +1,6 @@
 package com.gu.flexible.snapshotter.config
 
-import com.amazonaws.regions.{Region, Regions}
+import com.amazonaws.regions.Region
 import com.amazonaws.services.lambda.AWSLambdaClient
 import com.amazonaws.services.lambda.model.GetFunctionConfigurationRequest
 import com.amazonaws.services.lambda.runtime.Context

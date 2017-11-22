@@ -15,7 +15,6 @@ import play.api.libs.ws.WSClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.language.postfixOps
 
 class SchedulingLambda extends Logging {
   import ApiLogic._
