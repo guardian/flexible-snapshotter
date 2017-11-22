@@ -13,7 +13,7 @@ scalacOptions ++= Seq(
   "-Ywarn-unused-import")
 
 val awsVersion = "1.11.5"
-val playVersion = "2.5.0"
+val playVersion = "2.5.18"
 
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
