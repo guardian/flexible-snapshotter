@@ -3,13 +3,17 @@ import com.typesafe.sbt.packager.archetypes.JavaAppPackaging._
 name := "snapshotter-lambda"
 organization  := "com.gu"
 
-scalaVersion in ThisBuild := "2.11.8"
+scalaVersion in ThisBuild := "2.11.11"
 
 description   := "AWS lambdas to snapshot Flexible content to S3"
-scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
+scalacOptions ++= Seq(
+  "-deprecation",
+  "-feature",
+  "-unchecked",
+  "-Ywarn-unused-import")
 
-val awsVersion = "1.11.5"
-val playVersion = "2.5.0"
+val awsVersion = "1.11.234"
+val playVersion = "2.5.18"
 
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
@@ -22,7 +26,9 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk-sns" % awsVersion,
   "com.typesafe.play" %% "play-json" % playVersion,
   "com.typesafe.play" %% "play-ws" % playVersion,
-  "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+  "org.scalatest" %% "scalatest" % "2.2.5" % "test",
+  // This is required to force aws libraries to use the latest version of jackson
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.2"
 )
 
 publishMavenStyle := false

@@ -2,7 +2,6 @@ package com.gu.flexible.snapshotter.model
 
 import play.api.libs.json._
 
-import scala.language.postfixOps
 
 case class Snapshot(id: String, metadata: SnapshotMetadata, data: JsValue, fieldsToExtract: List[List[String]]) {
   val summaryMetadata: JsObject = Json.obj("reason" -> JsString(metadata.reason))

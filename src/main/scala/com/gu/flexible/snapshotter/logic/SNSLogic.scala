@@ -1,7 +1,7 @@
 package com.gu.flexible.snapshotter.logic
 
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
-import com.amazonaws.services.sns.AmazonSNSClient
+import com.amazonaws.services.sns.AmazonSNS
 import com.amazonaws.services.sns.model.{PublishRequest, PublishResult}
 import com.gu.flexible.snapshotter.Logging
 import com.gu.flexible.snapshotter.model.{Attempt, AttemptError, AttemptErrors}
@@ -34,7 +34,7 @@ object SNSLogic extends Logging {
     }
   }
 
-  def publish(topicArn: String, message: String)(implicit client: AmazonSNSClient): PublishResult = {
+  def publish(topicArn: String, message: String)(implicit client: AmazonSNS): PublishResult = {
     log.info(s"Sending to SNS: $message")
     val result = client.publish(
       new PublishRequest().

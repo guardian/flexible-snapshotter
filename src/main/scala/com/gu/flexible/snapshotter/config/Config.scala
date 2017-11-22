@@ -1,7 +1,7 @@
 package com.gu.flexible.snapshotter.config
 
-import com.amazonaws.regions.{Region, Regions}
-import com.amazonaws.services.lambda.AWSLambdaClient
+import com.amazonaws.regions.Region
+import com.amazonaws.services.lambda.AWSLambda
 import com.amazonaws.services.lambda.model.GetFunctionConfigurationRequest
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.flexible.snapshotter.Logging
@@ -31,7 +31,7 @@ object Config {
 }
 
 object LambdaConfig extends Logging {
-  def getDescriptionJson(context: Context)(implicit lambdaClient: AWSLambdaClient) = {
+  def getDescriptionJson(context: Context)(implicit lambdaClient: AWSLambda) = {
     val functionMetadata = lambdaClient.getFunctionConfiguration(
       new GetFunctionConfigurationRequest()
         .withFunctionName(context.getFunctionName)

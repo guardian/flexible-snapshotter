@@ -1,20 +1,20 @@
 package com.gu.flexible.snapshotter.resources
 
 import com.amazonaws.regions.Regions
-import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient
-import com.amazonaws.services.lambda.AWSLambdaClient
-import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.services.sns.AmazonSNSClient
+import com.amazonaws.services.cloudwatch.{AmazonCloudWatch, AmazonCloudWatchClientBuilder}
+import com.amazonaws.services.lambda.{AWSLambda, AWSLambdaClientBuilder}
+import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
+import com.amazonaws.services.sns.{AmazonSNS, AmazonSNSClientBuilder}
 
 object AWSClientFactory {
   def getRegion = Option(System.getenv("AWS_DEFAULT_REGION")).map(Regions.fromName).get
 
-  def createSNSClient(implicit region:Regions): AmazonSNSClient =
-    new AmazonSNSClient().withRegion(region)
-  def createS3Client(implicit region:Regions): AmazonS3Client =
-    new AmazonS3Client().withRegion(region)
-  def createLambdaClient(implicit region:Regions): AWSLambdaClient =
-    new AWSLambdaClient().withRegion(region)
-  def createCloudwatchClient(implicit region:Regions): AmazonCloudWatchClient =
-    new AmazonCloudWatchClient().withRegion(region)
+  def createSNSClient(implicit region:Regions): AmazonSNS =
+    AmazonSNSClientBuilder.standard().withRegion(region.getName).build()
+  def createS3Client(implicit region:Regions): AmazonS3 =
+    AmazonS3ClientBuilder.standard().withRegion(region.getName).build()
+  def createLambdaClient(implicit region:Regions): AWSLambda =
+    AWSLambdaClientBuilder.standard().withRegion(region.getName).build()
+  def createCloudwatchClient(implicit region:Regions): AmazonCloudWatch =
+    AmazonCloudWatchClientBuilder.standard().withRegion(region.getName).build()
 }

@@ -1,7 +1,7 @@
 package com.gu.flexible.snapshotter
 
 import com.amazonaws.regions.Regions
-import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
 import com.amazonaws.services.s3.model.PutObjectResult
@@ -13,7 +13,6 @@ import org.joda.time.DateTime
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.language.postfixOps
 
 class SnapshottingLambda extends Logging {
   import ApiLogic._
@@ -69,7 +68,7 @@ object SnapshottingLambda extends Logging {
   import MetricName._
 
   def logResults(results: Attempt[Seq[(Attempt[PutObjectResult],Attempt[PutObjectResult])]])
-    (implicit cloudWatchClient:AmazonCloudWatchClient, config: CommonConfig): Future[Unit] = {
+    (implicit cloudWatchClient:AmazonCloudWatch, config: CommonConfig): Future[Unit] = {
     results.fold(
       { failed =>
         CloudWatchLogic.putMetricData(
@@ -87,7 +86,7 @@ object SnapshottingLambda extends Logging {
   }
 
   def logResultsAttempts(succeeded: Seq[Attempt[PutObjectResult]], successMetric: Option[MetricName] = None,
-    failureMetric: Option[MetricName] = None)(implicit cloudWatchClient:AmazonCloudWatchClient, config: CommonConfig): Future[Unit] = {
+    failureMetric: Option[MetricName] = None)(implicit cloudWatchClient:AmazonCloudWatch, config: CommonConfig): Future[Unit] = {
     Future.sequence(succeeded.map(_.asFuture)).map { attempts =>
       attempts.foreach {
         case Left(failures) =>
