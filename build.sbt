@@ -26,7 +26,9 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk-sns" % awsVersion,
   "com.typesafe.play" %% "play-json" % playVersion,
   "com.typesafe.play" %% "play-ws" % playVersion,
-  "org.scalatest" %% "scalatest" % "2.2.5" % "test"
+  "org.scalatest" %% "scalatest" % "2.2.5" % "test",
+  // This is required to force aws libraries to use the latest version of jackson
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.2"
 )
 
 publishMavenStyle := false
