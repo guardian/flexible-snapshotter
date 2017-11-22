@@ -1,6 +1,6 @@
 package com.gu.flexible.snapshotter.logic
 
-import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.cloudwatch.model.{Dimension, MetricDatum, PutMetricDataRequest, StandardUnit}
 import com.gu.flexible.snapshotter.Logging
 import com.gu.flexible.snapshotter.config.CommonConfig
@@ -28,7 +28,7 @@ object CloudWatchLogic extends Logging {
     dimensions.map{ case (name, value) => new Dimension().withName(name).withValue(value) }
   }
 
-  def putMetricData(metrics: (String, MetricValue)*)(implicit cloudWatchClient: AmazonCloudWatchClient, config: CommonConfig) = {
+  def putMetricData(metrics: (String, MetricValue)*)(implicit cloudWatchClient: AmazonCloudWatch, config: CommonConfig) = {
     val dimensions = awsDimensions(config.cloudWatchDimensions:_*)
     val metricData = metrics.map { case (name, value) =>
       new MetricDatum().withMetricName(name).withUnit(value.unit).withValue(value.value).withDimensions(dimensions:_*)

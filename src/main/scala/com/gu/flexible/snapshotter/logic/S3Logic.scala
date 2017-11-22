@@ -3,7 +3,7 @@ package com.gu.flexible.snapshotter.logic
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
-import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.{ObjectMetadata, PutObjectRequest, PutObjectResult, SSEAwsKeyManagementParams}
 import com.amazonaws.{AmazonClientException, AmazonServiceException}
 import com.gu.flexible.snapshotter.Logging
@@ -15,13 +15,13 @@ import play.api.libs.json.{JsValue, Json}
 
 object S3Logic extends Logging {
   def uploadToS3Bucket(id: String, date: DateTime, content: JsValue)
-    (implicit s3Client: AmazonS3Client, config: SnapshotterConfig): Attempt[PutObjectResult] = {
+    (implicit s3Client: AmazonS3, config: SnapshotterConfig): Attempt[PutObjectResult] = {
     val key = makeKey(id, date, extension = "json")
     uploadToS3Bucket(key, content)
   }
 
   def uploadToS3Bucket(key: String, content: JsValue)
-    (implicit s3Client: AmazonS3Client, config: SnapshotterConfig): Attempt[PutObjectResult] = {
+    (implicit s3Client: AmazonS3, config: SnapshotterConfig): Attempt[PutObjectResult] = {
     val jsonBytes = Json.prettyPrint(content).getBytes(StandardCharsets.UTF_8)
 
     val objectMetadata = new ObjectMetadata()

@@ -3,7 +3,7 @@ package com.gu.flexible.snapshotter
 import java.util.{Map => JMap}
 
 import com.amazonaws.regions.Regions
-import com.amazonaws.services.cloudwatch.AmazonCloudWatchClient
+import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.sns.model.PublishResult
 import com.gu.flexible.snapshotter.config.{CommonConfig, Config, SchedulerConfig}
@@ -63,7 +63,7 @@ class SchedulingLambda extends Logging {
 
 object SchedulingLambda extends Logging {
   def logResult(result: Attempt[Seq[PublishResult]])
-    (implicit cloudWatchClient:AmazonCloudWatchClient, config: CommonConfig): Future[Unit] = {
+    (implicit cloudWatchClient:AmazonCloudWatch, config: CommonConfig): Future[Unit] = {
     result.fold(
       { errors =>
         errors.errors.foreach(_.logTo(log))
