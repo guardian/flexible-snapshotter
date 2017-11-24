@@ -16,10 +16,8 @@ val awsVersion = "1.11.234"
 val playVersion = "1.1.2"
 
 libraryDependencies ++= Seq(
-  "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
   "com.amazonaws" % "aws-lambda-java-events" % "1.1.0" intransitive(),
   "com.amazonaws" % "aws-lambda-java-log4j" % "1.0.0",
-  "org.slf4j" % "slf4j-log4j12" % "1.7.21",
   "com.amazonaws" % "aws-java-sdk-s3" % awsVersion,
   "com.amazonaws" % "aws-java-sdk-lambda" % awsVersion,
   "com.amazonaws" % "aws-java-sdk-cloudwatch" % awsVersion,
