@@ -11,7 +11,7 @@ import com.gu.flexible.snapshotter.logic._
 import com.gu.flexible.snapshotter.model.{Attempt, SnapshotMetadata, SnapshotRequest}
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}
 import org.apache.log4j.LogManager
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.StandaloneWSClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -21,7 +21,7 @@ class SchedulingLambda extends Logging {
   import SNSLogic._
 
   implicit val region: Regions = AWSClientFactory.getRegion
-  implicit val wsClient: WSClient = WSClientFactory.createClient
+  implicit val wsClient: StandaloneWSClient = WSClientFactory.createClient
   implicit val snsClient = AWSClientFactory.createSNSClient
   implicit val lambdaClient = AWSClientFactory.createLambdaClient
   implicit val cloudWatchClient = AWSClientFactory.createCloudwatchClient
