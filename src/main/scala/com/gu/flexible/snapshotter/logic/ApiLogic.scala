@@ -4,7 +4,7 @@ import com.gu.flexible.snapshotter.model._
 import com.gu.flexible.snapshotter.Logging
 import com.gu.flexible.snapshotter.config.CommonConfig
 import org.joda.time.DateTime
-import play.api.libs.json.{JsObject, JsValue}
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.libs.ws.{StandaloneWSClient, StandaloneWSRequest}
 
 import scala.concurrent.ExecutionContext
@@ -38,7 +38,7 @@ object ApiLogic extends Logging {
     val attempt = Attempt.Async.Right(request.get())
     attempt.flatMap { response =>
       response.status match {
-        case 200 => Attempt.Right(response.body.asInstanceOf[JsValue])
+        case 200 => Attempt.Right(Json.parse(response.body))
         case _ =>
           val message = s"${request.toString}: Response status was ${response.status}:${response.statusText}"
           log.warn(message)
