@@ -13,10 +13,9 @@ scalacOptions ++= Seq(
   "-Ywarn-unused-import")
 
 val awsVersion = "1.11.234"
-val playVersion = "2.5.18"
+val playVersion = "1.1.2"
 
 libraryDependencies ++= Seq(
-  "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
   "com.amazonaws" % "aws-lambda-java-events" % "1.1.0" intransitive(),
   "com.amazonaws" % "aws-lambda-java-log4j" % "1.0.0",
   "org.slf4j" % "slf4j-log4j12" % "1.7.21",
@@ -24,8 +23,8 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk-lambda" % awsVersion,
   "com.amazonaws" % "aws-java-sdk-cloudwatch" % awsVersion,
   "com.amazonaws" % "aws-java-sdk-sns" % awsVersion,
-  "com.typesafe.play" %% "play-json" % playVersion,
-  "com.typesafe.play" %% "play-ws" % playVersion,
+  "com.typesafe.play" %% "play-ws-standalone-json" % playVersion,
+  "com.typesafe.play" %% "play-ahc-ws-standalone" % playVersion,
   "org.scalatest" %% "scalatest" % "2.2.5" % "test",
   // This is required to force aws libraries to use the latest version of jackson
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.2"
