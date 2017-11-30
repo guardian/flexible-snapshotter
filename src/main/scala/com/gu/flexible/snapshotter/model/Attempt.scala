@@ -1,6 +1,7 @@
 package com.gu.flexible.snapshotter.model
 
 import org.slf4j.Logger
+import play.api.mvc.Result
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -119,6 +120,12 @@ object Attempt {
       Attempt(ferr.map(scala.Left(_)))
   }
 
+  def apply[A](action: => Attempt[Result])(errorHandler: AttemptErrors => Result)(implicit ec: ExecutionContext) = {
+    action.fold(
+      errorHandler,
+      identity
+    )
+  }
 }
 
 case class AttemptError(message: String, context: Option[String] = None, throwable: Option[Throwable] = None) {
