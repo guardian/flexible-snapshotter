@@ -4,18 +4,18 @@ import java.io.IOException
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import play.api.libs.ws.{WSClient, WSRequest}
-import play.api.libs.ws.ahc.AhcWSClient
+import play.api.libs.ws.{StandaloneWSClient, StandaloneWSRequest}
+import play.api.libs.ws.ahc.StandaloneAhcWSClient
 
 object WSClientFactory {
   def createClient = {
     implicit val system = ActorSystem("ws")
     implicit val materializer = ActorMaterializer()
-    val client = AhcWSClient()
+    val client = StandaloneAhcWSClient()
 
-    new WSClient {
+    new StandaloneWSClient {
       def underlying[T]: T = client.underlying
-      def url(url: String): WSRequest = client.url(url)
+      def url(url: String): StandaloneWSRequest = client.url(url)
 
       @scala.throws[IOException]
       def close(): Unit = {
