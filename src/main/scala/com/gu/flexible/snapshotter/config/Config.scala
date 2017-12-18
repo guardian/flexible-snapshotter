@@ -8,7 +8,7 @@ import com.gu.flexible.snapshotter.Logging
 import play.api.libs.json.Json
 
 object Config {
-  def apiUrl(stage: String, stack: String): String = s"http://api.${stage.toLowerCase}.${stack.toLowerCase}.gudiscovery.:8080"
+  def apiUrl(stage: String, stack: String): String = s"http://flexible-content-api-proxy.${stage.toLowerCase}.${stack.toLowerCase}.gudiscovery.:8080"
 
   def guessStage(context: Context): String =
     context.getFunctionName.split(Array('-','_')).toList.filter(_.length > 0).lastOption.getOrElse {
