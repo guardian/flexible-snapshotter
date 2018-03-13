@@ -11,7 +11,7 @@ object Config {
   def apiUrl(stage: String, stack: String): String = {
     val subDomain = stack match {
       case "flexible-secondary" => "apiv2" // we're not running a proxy (or mongo) in secondary, go direct to postgres
-      case _ => "flexible-content-api-proxy"
+      case _ => "flexible-api"
     }
 
     s"http://$subDomain.${stage.toLowerCase}.${stack.toLowerCase}.gudiscovery.:8080"
