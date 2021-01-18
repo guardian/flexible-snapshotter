@@ -11,9 +11,15 @@ import scala.concurrent.ExecutionContext
 
 object ApiLogic extends Logging {
   def contentForSnapshot(snapshotRequest: SnapshotRequest)(implicit ws:StandaloneWSClient, config:CommonConfig, context:ExecutionContext): Attempt[Snapshot] = snapshotRequest.content match {
-    case Some(content) => Attempt.Right(Snapshot(snapshotRequest.contentId, snapshotRequest.metadata, content, config.fieldsToExtract))
-    case None =>  contentForId(snapshotRequest.contentId).map { json =>
-      Snapshot(snapshotRequest.contentId, snapshotRequest.metadata, json, config.fieldsToExtract)
+    case Some(contentJson) => {
+      log.info(s"Snapshot for ID: ${snapshotRequest.contentId} already has content.")
+      Attempt.Right(Snapshot(snapshotRequest.contentId, snapshotRequest.metadata, contentJson, config.fieldsToExtract))
+    }
+    case None => {
+      log.info(s"Fetching content for snapshot with ID: ${snapshotRequest.contentId}")
+      contentForId(snapshotRequest.contentId).map { contentJson =>
+        Snapshot(snapshotRequest.contentId, snapshotRequest.metadata, contentJson, config.fieldsToExtract)
+      }
     }
   }
 
