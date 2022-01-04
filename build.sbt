@@ -19,6 +19,7 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.1.0",
   "com.amazonaws" % "aws-lambda-java-events" % "1.1.0" intransitive(),
   "com.amazonaws" % "aws-lambda-java-log4j2" % "1.5.0",
+  "org.slf4j" % "slf4j-log4j12" % "1.7.32",
   "net.logstash.log4j" % "jsonevent-layout" % "1.7",
   "com.amazonaws" % "aws-java-sdk-s3" % awsVersion,
   "com.amazonaws" % "aws-java-sdk-lambda" % awsVersion,
