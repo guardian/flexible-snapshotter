@@ -11,6 +11,7 @@ class FakeContext extends Context {
 
   val logger = new LambdaLogger {
     def log(string: String): Unit = System.out.println(string)
+    def log(bytes: Array[Byte]): Unit = System.out.println(bytes)
   }
   def getLogger: LambdaLogger = logger
 

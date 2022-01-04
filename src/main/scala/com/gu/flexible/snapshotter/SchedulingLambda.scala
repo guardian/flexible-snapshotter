@@ -10,7 +10,6 @@ import com.gu.flexible.snapshotter.config.{CommonConfig, Config, SchedulerConfig
 import com.gu.flexible.snapshotter.logic._
 import com.gu.flexible.snapshotter.model.{Attempt, SnapshotMetadata, SnapshotRequest}
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}
-import org.apache.log4j.LogManager
 import play.api.libs.ws.StandaloneWSClient
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -54,7 +53,6 @@ class SchedulingLambda extends Logging {
   }
 
   def shutdown() = {
-    LogManager.shutdown()
     snsClient.shutdown()
     lambdaClient.shutdown()
     wsClient.close()
