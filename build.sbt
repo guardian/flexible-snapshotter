@@ -12,7 +12,7 @@ scalacOptions ++= Seq(
   "-unchecked",
   "-Ywarn-unused-import")
 
-val awsVersion = "1.11.234"
+val awsVersion = "1.12.148"
 val playVersion = "1.1.2"
 
 libraryDependencies ++= Seq(

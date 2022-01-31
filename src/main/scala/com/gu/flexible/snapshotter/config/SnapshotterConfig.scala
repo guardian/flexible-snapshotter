@@ -1,6 +1,5 @@
 package com.gu.flexible.snapshotter.config
 
-import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.lambda.AWSLambda
 import com.amazonaws.services.lambda.runtime.Context
 import play.api.libs.json.Json
@@ -14,8 +13,7 @@ case class SnapshotterConfig(
   bucket: String,
   stage: String,
   stack: String,
-  kmsKey: Option[String] = None,
-  region: Region = Regions.getCurrentRegion) extends CommonConfig
+  kmsKey: Option[String] = None) extends CommonConfig
 
 object SnapshotterConfig {
   def resolve(stage: String, context: Context)(implicit lambdaClient: AWSLambda): SnapshotterConfig = {
