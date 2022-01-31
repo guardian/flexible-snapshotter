@@ -1,6 +1,5 @@
 package com.gu.flexible.snapshotter.config
 
-import com.amazonaws.regions.Region
 import com.amazonaws.services.lambda.AWSLambda
 import com.amazonaws.services.lambda.model.GetFunctionConfigurationRequest
 import com.amazonaws.services.lambda.runtime.Context
@@ -48,7 +47,6 @@ object LambdaConfig extends Logging {
 }
 
 trait CommonConfig {
-  def region: Region
   def cloudWatchNameSpace: String = "SnapshotterLambdas"
   def cloudWatchDimensions: Seq[(String,String)] = Seq("Stage" -> stage)
   def stage: String

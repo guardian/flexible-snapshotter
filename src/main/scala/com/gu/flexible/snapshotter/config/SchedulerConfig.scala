@@ -1,6 +1,5 @@
 package com.gu.flexible.snapshotter.config
 
-import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.lambda.AWSLambda
 import com.amazonaws.services.lambda.runtime.Context
 import com.gu.flexible.snapshotter.Logging
@@ -14,8 +13,7 @@ case class LambdaSchedulerConfig(snsTopicArn: String, stack: String)
 case class SchedulerConfig(
   snsTopicArn: String,
   stage: String,
-  stack: String,
-  region: Region = Regions.getCurrentRegion) extends CommonConfig
+  stack: String) extends CommonConfig
 
 object SchedulerConfig extends Logging {
   def resolve(stage: String, context: Context)(implicit lambdaClient: AWSLambda): SchedulerConfig = {

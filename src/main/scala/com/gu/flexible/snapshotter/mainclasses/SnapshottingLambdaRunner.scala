@@ -1,6 +1,5 @@
 package com.gu.flexible.snapshotter.mainclasses
 
-import com.amazonaws.regions.{Region, Regions}
 import com.gu.flexible.snapshotter.SnapshottingLambda
 import com.gu.flexible.snapshotter.config.SnapshotterConfig
 import com.gu.flexible.snapshotter.logic.{FutureUtils, SNSLogic}
@@ -16,8 +15,7 @@ object SnapshottingLambdaRunner extends App {
   val config = new SnapshotterConfig(
     bucket = bucket,
     stage = "DEV",
-    stack = stack,
-    region = Region.getRegion(Regions.EU_WEST_1)
+    stack = stack
   )
   val results = sl.snapshot(input,
     config,
