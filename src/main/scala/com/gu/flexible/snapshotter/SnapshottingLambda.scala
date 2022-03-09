@@ -22,22 +22,21 @@ class SnapshottingLambda extends Logging {
   implicit val region: Regions = AWSClientFactory.getRegion
   implicit val wsClient = WSClientFactory.createClient
   implicit val s3Client = AWSClientFactory.createS3Client
-  implicit val lambdaClient = AWSClientFactory.createLambdaClient
   implicit val cloudWatchClient = AWSClientFactory.createCloudwatchClient
 
-  def run(input: SNSEvent, context: Context): Unit = {
-    implicit val config = SnapshotterConfig.resolve(Config.guessStage(context), context)
+  def run(input: SNSEvent): Unit = {
+    implicit val config = SnapshotterConfig.resolve().get
 
     val requests = fromLambdaEvent(input)
     log.info(s"Processing message IDs: ${requests.map(_.id).mkString(", ")}")
 
-    val results = snapshot(requests.map(_.content), config, context)
+    val results = snapshot(requests.map(_.content), config)
     val fin = SnapshottingLambda.logResults(results)
 
     FutureUtils.await(fin)
   }
 
-  def snapshot(requests: Seq[String], config: SnapshotterConfig, context: Context): Attempt[Seq[(Attempt[PutObjectResult], Attempt[PutObjectResult])]] = {
+  def snapshot(requests: Seq[String], config: SnapshotterConfig): Attempt[Seq[(Attempt[PutObjectResult], Attempt[PutObjectResult])]] = {
     implicit val implicitConfig = config
     val snapshotRequestAttempts = requests.map(deserialise[SnapshotRequest])
     for {
@@ -58,7 +57,6 @@ class SnapshottingLambda extends Logging {
   }
 
   def shutdown(): Unit = {
-    lambdaClient.shutdown()
     s3Client.shutdown()
     wsClient.close()
   }

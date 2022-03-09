@@ -16,7 +16,7 @@ object SchedulingLambdaRunner extends App {
     stage = "DEV"
   )
 
-  val result = sl.schedule(config, new FakeContext())
+  val result = sl.schedule(config)
   val fin = SchedulingLambda.logResult(result)(sl.cloudWatchClient, config)
   FutureUtils.await(fin)
   sl.shutdown()

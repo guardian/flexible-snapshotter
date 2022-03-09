@@ -1,9 +1,9 @@
 package com.gu.flexible.snapshotter.config
 
-import com.amazonaws.services.lambda.AWSLambda
-import com.amazonaws.services.lambda.runtime.Context
 import com.gu.flexible.snapshotter.Logging
 import play.api.libs.json.Json
+
+import scala.util.Properties.envOrNone
 
 object LambdaSchedulerConfig {
   implicit val configReads = Json.reads[LambdaSchedulerConfig]
@@ -16,13 +16,13 @@ case class SchedulerConfig(
   stack: String) extends CommonConfig
 
 object SchedulerConfig extends Logging {
-  def resolve(stage: String, context: Context)(implicit lambdaClient: AWSLambda): SchedulerConfig = {
-    val lambdaJson = LambdaConfig.getDescriptionJson(context)
-    val lambdaConfig = lambdaJson.as[LambdaSchedulerConfig]
-    SchedulerConfig(
-      snsTopicArn = lambdaConfig.snsTopicArn,
-      stage = stage,
-      stack = lambdaConfig.stack
-    )
-  }
+  def resolve(): Option[SchedulerConfig] = for {
+    snsTopicArn <- envOrNone("SNS_TOPIC_ARN")
+    stage <- envOrNone("STAGE")
+    stack <- envOrNone("STACK")
+  } yield SchedulerConfig(
+    snsTopicArn,
+    stage,
+    stack
+  )
 }

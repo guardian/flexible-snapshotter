@@ -6,7 +6,7 @@ import com.amazonaws.regions.Regions
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.sns.model.PublishResult
-import com.gu.flexible.snapshotter.config.{CommonConfig, Config, SchedulerConfig}
+import com.gu.flexible.snapshotter.config.{CommonConfig, SchedulerConfig}
 import com.gu.flexible.snapshotter.logic._
 import com.gu.flexible.snapshotter.model.{Attempt, SnapshotMetadata, SnapshotRequest}
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}
@@ -22,19 +22,18 @@ class SchedulingLambda extends Logging {
   implicit val region: Regions = AWSClientFactory.getRegion
   implicit val wsClient: StandaloneWSClient  = WSClientFactory.createClient
   implicit val snsClient = AWSClientFactory.createSNSClient
-  implicit val lambdaClient = AWSClientFactory.createLambdaClient
   implicit val cloudWatchClient = AWSClientFactory.createCloudwatchClient
 
   // this is run under a lambda cron
-  def run(event: JMap[String, Object], context: Context): Unit = {
-    implicit val config = SchedulerConfig.resolve(Config.guessStage(context), context)
-    val result = schedule(config, context)
+  def run(): Unit = {
+    implicit val config = SchedulerConfig.resolve().get
+    val result = schedule(config)
     val fin = SchedulingLambda.logResult(result)
 
     FutureUtils.await(fin)
   }
 
-  def schedule(config: SchedulerConfig, context: Context): Attempt[Seq[PublishResult]] = {
+  def schedule(config: SchedulerConfig): Attempt[Seq[PublishResult]] = {
     implicit val implicitConfig = config
     log.info(s"$config")
 
@@ -54,7 +53,6 @@ class SchedulingLambda extends Logging {
 
   def shutdown() = {
     snsClient.shutdown()
-    lambdaClient.shutdown()
     wsClient.close()
   }
 }

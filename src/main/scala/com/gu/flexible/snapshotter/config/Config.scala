@@ -36,16 +36,6 @@ object Config {
   ).map(_.split("\\.").toList)
 }
 
-object LambdaConfig extends Logging {
-  def getDescriptionJson(context: Context)(implicit lambdaClient: AWSLambda) = {
-    val functionMetadata = lambdaClient.getFunctionConfiguration(
-      new GetFunctionConfigurationRequest()
-        .withFunctionName(context.getFunctionName)
-    )
-    Json.parse(functionMetadata.getDescription)
-  }
-}
-
 trait CommonConfig {
   def cloudWatchNameSpace: String = "SnapshotterLambdas"
   def cloudWatchDimensions: Seq[(String,String)] = Seq("Stage" -> stage)
