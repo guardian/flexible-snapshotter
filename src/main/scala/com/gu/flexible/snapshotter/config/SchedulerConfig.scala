@@ -3,7 +3,6 @@ package com.gu.flexible.snapshotter.config
 import com.gu.flexible.snapshotter.Logging
 import play.api.libs.json.Json
 
-import scala.util.Properties.envOrNone
 
 object LambdaSchedulerConfig {
   implicit val configReads = Json.reads[LambdaSchedulerConfig]
@@ -17,9 +16,9 @@ case class SchedulerConfig(
 
 object SchedulerConfig extends Logging {
   def resolve(): Option[SchedulerConfig] = for {
-    snsTopicArn <- envOrNone("SNS_TOPIC_ARN")
-    stage <- envOrNone("STAGE")
-    stack <- envOrNone("STACK")
+    snsTopicArn <- Config.envOrNoneAndLog("SNS_TOPIC_ARN")
+    stage <- Config.envOrNoneAndLog("STAGE")
+    stack <- Config.envOrNoneAndLog("STACK")
   } yield SchedulerConfig(
     snsTopicArn,
     stage,

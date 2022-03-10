@@ -17,10 +17,10 @@ case class SnapshotterConfig(
 
 object SnapshotterConfig {
   def resolve(): Option[SnapshotterConfig] = for {
-   bucket <- envOrNone("SNAPSHOT_BUCKET")
-   stage <- envOrNone("STAGE")
-   stack <- envOrNone("STACK")
-   kmsKey = envOrNone("KMS_KEY_ARN")
+   bucket <- Config.envOrNoneAndLog("SNAPSHOT_BUCKET")
+   stage <- Config.envOrNoneAndLog("STAGE")
+   stack <- Config.envOrNoneAndLog("STACK")
+   kmsKey = Config.envOrNoneAndLog("KMS_KEY_ARN")
   } yield SnapshotterConfig(
     bucket,
     stage,
