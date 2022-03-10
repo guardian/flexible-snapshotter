@@ -1,8 +1,8 @@
 package com.gu.flexible.snapshotter.config
 
-import com.amazonaws.services.lambda.AWSLambda
-import com.amazonaws.services.lambda.runtime.Context
 import play.api.libs.json.Json
+
+import scala.util.Properties.envOrNone
 
 object LambdaSnapshotterConfig {
   implicit val configReads = Json.reads[LambdaSnapshotterConfig]
@@ -16,14 +16,22 @@ case class SnapshotterConfig(
   kmsKey: Option[String] = None) extends CommonConfig
 
 object SnapshotterConfig {
-  def resolve(stage: String, context: Context)(implicit lambdaClient: AWSLambda): SnapshotterConfig = {
-    val lambdaJson = LambdaConfig.getDescriptionJson(context)
-    val lambdaConfig = lambdaJson.as[LambdaSnapshotterConfig]
-    SnapshotterConfig(
-      bucket = lambdaConfig.bucket,
-      stage = stage,
-      kmsKey = lambdaConfig.kmsKey,
-      stack = lambdaConfig.stack
+  def resolve(): Option[SnapshotterConfig] = {
+    val maybeBucket = Config.envOrNoneAndLog("SNAPSHOT_BUCKET")
+    val maybeStage = Config.envOrNoneAndLog("STAGE")
+    val maybeStack = Config.envOrNoneAndLog("STACK")
+    val maybeKmsKey = Config.envOrNoneAndLog("KMS_KEY_ARN")
+
+    for {
+      bucket <- maybeBucket
+      stage <- maybeStage
+      stack <- maybeStack
+      kmsKey = maybeKmsKey
+    } yield SnapshotterConfig(
+      bucket,
+      stage,
+      stack,
+      kmsKey
     )
   }
 }

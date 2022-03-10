@@ -18,8 +18,7 @@ object SnapshottingLambdaRunner extends App {
     stack = stack
   )
   val results = sl.snapshot(input,
-    config,
-    new FakeContext()
+    config
   )
   val fin = SnapshottingLambda.logResults(results)(sl.cloudWatchClient, config)
   FutureUtils.await(fin)
