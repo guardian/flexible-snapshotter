@@ -16,16 +16,23 @@ case class SnapshotterConfig(
   kmsKey: Option[String] = None) extends CommonConfig
 
 object SnapshotterConfig {
-  def resolve(): Option[SnapshotterConfig] = for {
-   bucket <- Config.envOrNoneAndLog("SNAPSHOT_BUCKET")
-   stage <- Config.envOrNoneAndLog("STAGE")
-   stack <- Config.envOrNoneAndLog("STACK")
-   kmsKey = Config.envOrNoneAndLog("KMS_KEY_ARN")
-  } yield SnapshotterConfig(
-    bucket,
-    stage,
-    stack,
-    kmsKey
-  )
+  def resolve(): Option[SnapshotterConfig] = {
+    val maybeBucket = Config.envOrNoneAndLog("SNAPSHOT_BUCKET")
+    val maybeStage = Config.envOrNoneAndLog("STAGE")
+    val maybeStack = Config.envOrNoneAndLog("STACK")
+    val maybeKmsKey = Config.envOrNoneAndLog("KMS_KEY_ARN")
+
+    for {
+      bucket <- maybeBucket
+      stage <- maybeStage
+      stack <- maybeStack
+      kmsKey = maybeKmsKey
+    } yield SnapshotterConfig(
+      bucket,
+      stage,
+      stack,
+      kmsKey
+    )
+  }
 }
 

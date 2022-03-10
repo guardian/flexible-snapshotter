@@ -15,13 +15,19 @@ case class SchedulerConfig(
   stack: String) extends CommonConfig
 
 object SchedulerConfig extends Logging {
-  def resolve(): Option[SchedulerConfig] = for {
-    snsTopicArn <- Config.envOrNoneAndLog("SNS_TOPIC_ARN")
-    stage <- Config.envOrNoneAndLog("STAGE")
-    stack <- Config.envOrNoneAndLog("STACK")
-  } yield SchedulerConfig(
-    snsTopicArn,
-    stage,
-    stack
-  )
+  def resolve(): Option[SchedulerConfig] = {
+    val maybeSnsTopicArn = Config.envOrNoneAndLog("SNS_TOPIC_ARN")
+    val maybeStage = Config.envOrNoneAndLog("STAGE")
+    val maybeStack = Config.envOrNoneAndLog("STACK")
+
+    for {
+      snsTopicArn <- maybeSnsTopicArn
+      stage <- maybeStage
+      stack <- maybeStack
+    } yield SchedulerConfig(
+      snsTopicArn,
+      stage,
+      stack
+    )
+  }
 }
