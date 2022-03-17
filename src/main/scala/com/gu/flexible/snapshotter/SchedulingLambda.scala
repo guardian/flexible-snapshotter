@@ -1,10 +1,7 @@
 package com.gu.flexible.snapshotter
 
-import java.util.{Map => JMap}
-
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.sns.model.PublishResult
 import com.gu.flexible.snapshotter.config.{CommonConfig, SchedulerConfig}
 import com.gu.flexible.snapshotter.logic._

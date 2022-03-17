@@ -7,7 +7,7 @@ import com.gu.flexible.snapshotter.Logging
 import com.gu.flexible.snapshotter.model.{Attempt, AttemptError, AttemptErrors}
 import play.api.libs.json.{Json, Reads, Writes}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 case class SNSMessage(id: String, content: String)
 
