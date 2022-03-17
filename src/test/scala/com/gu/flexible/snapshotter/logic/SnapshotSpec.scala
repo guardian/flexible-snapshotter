@@ -1,10 +1,10 @@
 package com.gu.flexible.snapshotter.logic
 
 import com.gu.flexible.snapshotter.model.{Snapshot, SnapshotMetadata}
-import org.scalatest.{FlatSpec, ShouldMatchers}
+import org.scalatest.{flatspec, matchers}
 import play.api.libs.json.{JsBoolean, JsString, Json}
 
-class SnapshotSpec extends FlatSpec with ShouldMatchers {
+class SnapshotSpec extends flatspec.AnyFlatSpec with matchers.should.Matchers {
   val testJson = Json.obj(
     "test1" -> Json.obj(
       "field1a" -> JsString("bubbles"),

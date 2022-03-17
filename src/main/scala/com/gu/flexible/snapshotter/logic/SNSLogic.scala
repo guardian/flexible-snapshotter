@@ -31,7 +31,7 @@ object SNSLogic extends Logging {
   def fromLambdaEvent(event: SNSEvent): Seq[SNSMessage] = {
     event.getRecords.asScala.map{ record =>
       SNSMessage(record.getSNS.getMessageId, record.getSNS.getMessage)
-    }
+    }.toList
   }
 
   def publish(topicArn: String, message: String)(implicit client: AmazonSNS): PublishResult = {

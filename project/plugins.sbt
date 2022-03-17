@@ -1,7 +1,7 @@
-addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.1.0")
+addSbtPlugin("com.github.sbt" %% "sbt-native-packager" % "1.9.9")
 
-addSbtPlugin("com.gu" % "sbt-riffraff-artifact" % "0.9.7")
+addSbtPlugin("com.gu" % "sbt-riffraff-artifact" % "1.1.18")
 
 addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.5.3")
 
-addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.0")
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.10.0-RC1")
