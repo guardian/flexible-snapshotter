@@ -2,10 +2,9 @@ package com.gu.flexible.snapshotter
 
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
-import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
 import com.amazonaws.services.s3.model.PutObjectResult
-import com.gu.flexible.snapshotter.config.{CommonConfig, Config, SnapshotterConfig}
+import com.gu.flexible.snapshotter.config.{CommonConfig, SnapshotterConfig}
 import com.gu.flexible.snapshotter.logic._
 import com.gu.flexible.snapshotter.model.{Attempt, SnapshotRequest}
 import com.gu.flexible.snapshotter.resources.{AWSClientFactory, WSClientFactory}

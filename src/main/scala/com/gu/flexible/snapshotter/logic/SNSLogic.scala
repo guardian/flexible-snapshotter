@@ -7,7 +7,7 @@ import com.gu.flexible.snapshotter.Logging
 import com.gu.flexible.snapshotter.model.{Attempt, AttemptError, AttemptErrors}
 import play.api.libs.json.{Json, Reads, Writes}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 case class SNSMessage(id: String, content: String)
 
@@ -31,7 +31,7 @@ object SNSLogic extends Logging {
   def fromLambdaEvent(event: SNSEvent): Seq[SNSMessage] = {
     event.getRecords.asScala.map{ record =>
       SNSMessage(record.getSNS.getMessageId, record.getSNS.getMessage)
-    }
+    }.toList
   }
 
   def publish(topicArn: String, message: String)(implicit client: AmazonSNS): PublishResult = {

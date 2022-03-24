@@ -137,7 +137,7 @@ object AttemptErrors {
   def apply(error: AttemptError): AttemptErrors = {
     AttemptErrors(List(error))
   }
-  def apply(errors: Seq[AttemptError]): AttemptErrors = {
+  def apply(errors: scala.collection.Seq[AttemptError]): AttemptErrors = {
     AttemptErrors(errors.toList)
   }
 }

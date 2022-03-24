@@ -2,8 +2,6 @@ package com.gu.flexible.snapshotter.config
 
 import play.api.libs.json.Json
 
-import scala.util.Properties.envOrNone
-
 object LambdaSnapshotterConfig {
   implicit val configReads = Json.reads[LambdaSnapshotterConfig]
 }
