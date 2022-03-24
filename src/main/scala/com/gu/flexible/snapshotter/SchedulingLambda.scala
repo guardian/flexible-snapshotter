@@ -25,8 +25,9 @@ class SchedulingLambda extends Logging {
   def run(): Unit = {
     implicit val config = SchedulerConfig.resolve().get
     val result = schedule(config)
+    log.info(s"Started logging results")
     val fin = SchedulingLambda.logResult(result)
-
+    log.info(s"Finished logging results")
     FutureUtils.await(fin)
   }
 
@@ -41,6 +42,7 @@ class SchedulingLambda extends Logging {
       contentIds = parseContentIds(apiResult)
       snapshotRequests = contentIds.map(SnapshotRequest(_, metadata))
     } yield {
+      log.info(s"Yielded snapshot requests")
       snapshotRequests.map { request =>
         val serialisedRequest = serialise(request)
         publish(config.snsTopicArn, serialisedRequest)
@@ -49,6 +51,7 @@ class SchedulingLambda extends Logging {
   }
 
   def shutdown() = {
+    log.info(s"Shutdown function")
     snsClient.shutdown()
     wsClient.close()
   }
