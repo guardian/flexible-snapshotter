@@ -10,7 +10,6 @@ deployments:
       - -snapshotter-snapshotting-
       - -snapshotter-scheduling-
       fileName: snapshotter-lambda.zip
-      bucket: composer-dist
     type: aws-lambda
 regions:
 - eu-west-1
