@@ -39,8 +39,9 @@ jobs:
 
       - name: Build and Test project
         run: |
-          sbt "clean" "compile" "test" "Universal/packageBin"
-          cp target/scala*/snapshotter-lambda.zip ./snapshotter-lambda.zip
+          sbt sbt clean compile test universal:packageBin
+          cp target/universal snapshotter-lambda.zip ./snapshotter-lambda.zip
+
       - uses: guardian/actions-riff-raff@v2
         with:
           projectName: editorial-tools:flexible:snapshotter-lambda
