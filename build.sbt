@@ -34,7 +34,7 @@ libraryDependencies ++= Seq(
 
 publishMavenStyle := false
 
-enablePlugins(JavaAppPackaging, RiffRaffArtifact)
+enablePlugins(JavaAppPackaging)
 
 Universal / topLevelDirectory := None
 Universal / packageName := normalizedName.value
