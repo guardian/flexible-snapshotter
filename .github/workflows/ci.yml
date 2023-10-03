@@ -27,7 +27,7 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          distribution: "adopt"
+          distribution: "corretto"
           java-version: "8"
           cache: "sbt"
 
