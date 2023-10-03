@@ -38,8 +38,3 @@ enablePlugins(JavaAppPackaging, RiffRaffArtifact)
 
 Universal / topLevelDirectory := None
 Universal / packageName := normalizedName.value
-
-riffRaffPackageType := (Universal / packageBin).value
-riffRaffUploadArtifactBucket := Option("riffraff-artifact")
-riffRaffUploadManifestBucket := Option("riffraff-builds")
-riffRaffManifestProjectName :=  s"editorial-tools:flexible:${name.value}"
