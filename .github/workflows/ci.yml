@@ -39,7 +39,7 @@ jobs:
 
       - name: Build and Test project
         run: |
-          sbt clean compile test universal:packageBin
+          sbt clean compile test Universal/packageBin
           cp target/universal/snapshotter-lambda.zip ./snapshotter-lambda.zip
 
       - uses: guardian/actions-riff-raff@v2
