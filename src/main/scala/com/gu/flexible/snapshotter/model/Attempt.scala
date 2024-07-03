@@ -22,6 +22,13 @@ case class Attempt[A] private (underlying: Future[Either[AttemptErrors, A]]) {
 
   def foreach(f: A => Unit)(implicit ec: ExecutionContext): Unit = map(f)
 
+  def recoverWith(fn: AttemptErrors => Attempt[A])(implicit ec: ExecutionContext): Attempt[A] = Attempt {
+    asFuture.flatMap {
+      case Left(errors) => fn(errors).asFuture
+      case other => Future.successful(other)
+    }
+  }
+
   /**
     * If there is an error in the Future itself (e.g. a timeout) we convert it to a
     * Left so we have a consistent error representation. This would likely have
