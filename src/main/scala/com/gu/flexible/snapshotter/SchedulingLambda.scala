@@ -37,7 +37,7 @@ class SchedulingLambda extends Logging {
     val metadata = SnapshotMetadata("Scheduled snapshot")
 
     for {
-      apiResult <- contentModifiedSince(fiveMinutesAgo)
+      apiResult <- Retry(contentModifiedSince(fiveMinutesAgo), 2)
       contentIds = parseContentIds(apiResult)
       snapshotRequests = contentIds.map(SnapshotRequest(_, metadata))
     } yield {
