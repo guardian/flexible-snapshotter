@@ -12,8 +12,8 @@ scalacOptions ++= Seq(
   "-unchecked",
   "-Ywarn-unused:imports")
 
-val awsVersion = "1.12.148"
-val playVersion = "2.1.3"
+val awsVersion = "1.12.765"
+val playVersion = "2.2.9"
 
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.1",
@@ -27,9 +27,9 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk-sns" % awsVersion,
   "com.typesafe.play" %% "play-ws-standalone-json" % playVersion,
   "com.typesafe.play" %% "play-ahc-ws-standalone" % playVersion,
-  "org.scalatest" %% "scalatest" % "3.1.2" % "test",
+  "org.scalatest" %% "scalatest" % "3.2.19" % "test",
   // This is required to force aws libraries to use the latest version of jackson
-  "com.fasterxml.jackson.core" % "jackson-databind" % "2.9.2"
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.12.6.1"
 )
 
 publishMavenStyle := false

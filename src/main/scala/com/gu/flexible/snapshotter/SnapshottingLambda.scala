@@ -1,6 +1,6 @@
 package com.gu.flexible.snapshotter
 
-import com.amazonaws.regions.Regions
+import com.amazonaws.regions.Region
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.lambda.runtime.events.SNSEvent
 import com.amazonaws.services.s3.model.PutObjectResult
@@ -18,7 +18,7 @@ class SnapshottingLambda extends Logging {
   import S3Logic._
   import SNSLogic._
 
-  implicit val region: Regions = AWSClientFactory.getRegion
+  implicit val region: Region = AWSClientFactory.getRegion
   implicit val wsClient = WSClientFactory.createClient
   implicit val s3Client = AWSClientFactory.createS3Client
   implicit val cloudWatchClient = AWSClientFactory.createCloudwatchClient

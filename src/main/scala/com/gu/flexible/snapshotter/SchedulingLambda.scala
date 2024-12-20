@@ -1,6 +1,6 @@
 package com.gu.flexible.snapshotter
 
-import com.amazonaws.regions.Regions
+import com.amazonaws.regions.Region
 import com.amazonaws.services.cloudwatch.AmazonCloudWatch
 import com.amazonaws.services.sns.model.PublishResult
 import com.gu.flexible.snapshotter.config.{CommonConfig, SchedulerConfig}
@@ -16,7 +16,7 @@ class SchedulingLambda extends Logging {
   import ApiLogic._
   import SNSLogic._
 
-  implicit val region: Regions = AWSClientFactory.getRegion
+  implicit val region: Region = AWSClientFactory.getRegion
   implicit val wsClient: StandaloneWSClient  = WSClientFactory.createClient
   implicit val snsClient = AWSClientFactory.createSNSClient
   implicit val cloudWatchClient = AWSClientFactory.createCloudwatchClient
