@@ -6,3 +6,4 @@ target
 .vscode/
 **/.bloop
 metals.sbt
+**/.DS_Store
