@@ -3,7 +3,7 @@ import com.typesafe.sbt.packager.archetypes.JavaAppPackaging._
 name := "snapshotter-lambda"
 organization  := "com.gu"
 
-scalaVersion := "2.13.8"
+scalaVersion := "2.13.9"
 
 description   := "AWS lambdas to snapshot Flexible content to S3"
 scalacOptions ++= Seq(
