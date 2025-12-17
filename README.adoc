@@ -1,6 +1,6 @@
 == Flexible Content Snapshotter (v2)
 
-The repo is composed of two lambdas: the scheduler and the snapshotter.
+The repo is composed of two lambdas: the scheduler and the snapshotter. The UI to view snapshots and restore them lives in https://github.com/guardian/flexible-restorer[flexible-restorer].
 
 Snapshotter schematic
 ----
