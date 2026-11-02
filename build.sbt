@@ -14,6 +14,7 @@ scalacOptions ++= Seq(
 
 val awsVersion = "1.12.765"
 val playVersion = "2.2.9"
+val jacksonVersion = "2.18.11"
 
 libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-lambda-java-core" % "1.2.1",
@@ -28,8 +29,17 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-ws-standalone-json" % playVersion,
   "com.typesafe.play" %% "play-ahc-ws-standalone" % playVersion,
   "org.scalatest" %% "scalatest" % "3.2.19" % "test",
-  // This is required to force aws libraries to use the latest version of jackson
-  "com.fasterxml.jackson.core" % "jackson-databind" % "2.12.6.1"
+  "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion
+)
+
+// Keep Play and AWS transitive Jackson modules on the same patched release.
+dependencyOverrides ++= Seq(
+  "com.fasterxml.jackson.core" % "jackson-core" % jacksonVersion,
+  "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
+  "com.fasterxml.jackson.core" % "jackson-annotations" % jacksonVersion,
+  "com.fasterxml.jackson.dataformat" % "jackson-dataformat-cbor" % jacksonVersion,
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % jacksonVersion,
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % jacksonVersion
 )
 
 publishMavenStyle := false
